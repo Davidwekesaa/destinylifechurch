@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { set, sub } from "date-fns";
 import { noCase } from "change-case";
 import { faker } from "@faker-js/faker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // @mui
 import {
   Box,
@@ -33,7 +33,7 @@ import axios from "axios";
 
 // ----------------------------------------------------------------------
 
-function AddNewPupil({ open, handleCloseMenu }) {
+function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   const [pName, setPname] = useState("");
   const [pContact, setpContact] = useState("");
   const [relationShip, setRelationShip] = useState("");
@@ -43,6 +43,10 @@ function AddNewPupil({ open, handleCloseMenu }) {
   const [age, setAge] = useState("");
   const [cCategory, setcCategory] = useState("");
   const emptyFields = () => toast.error("All the fields are required");
+
+  useEffect(() => {
+    setcCategory(headTextdata);
+  }, [headTextdata]);
 
   const setEmptyFields = () => {
     setPname("");
@@ -68,7 +72,7 @@ function AddNewPupil({ open, handleCloseMenu }) {
       emptyFields();
     } else {
       await axios
-        .post(`http://localhost:5000/api/childrens/`, {
+        .post(`http://localhost:5000/api/children/`, {
           parentName: pName,
           parentContact: pContact,
           Relationship: relationShip,
@@ -76,7 +80,7 @@ function AddNewPupil({ open, handleCloseMenu }) {
           childGender: cGender,
           DOB: "",
           childAge: age,
-          childCategory: cCategory,
+          childCategory: cCategory.toLowerCase(),
         })
         .then((logins) => {
           setEmptyFields();
@@ -215,9 +219,10 @@ function AddNewPupil({ open, handleCloseMenu }) {
               label="Category"
               placeholder="eg dazzlers"
               sx={{ marginBottom: 2 }}
-              required
-              onChange={(e) => setcCategory(e.target.value)}
+              // required
+              // onChange={(e) => setcCategory(headText)}
               value={cCategory}
+              disabled={true}
             />
 
             <Box

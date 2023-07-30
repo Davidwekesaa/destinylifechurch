@@ -38,11 +38,17 @@ import AddNewPupil from "../layouts/dashboard/header/AddNewPupil";
 import useResponsive from "../hooks/useResponsive";
 import { useStateValue } from "../store/StateProvider";
 import { actionType } from "../store/reducer";
-import { formatDate } from "../utils/FormatDate";
+import {
+  formatDate,
+  getPresentToday,
+  isMissing,
+  isPresent,
+  updateAttendanceIsPresent,
+  updateAttendanceIsMissing,
+} from "../utils/userPageFunctions";
 import axios from "axios";
 
 // ----------------------------------------------------------------------
-const presentOn = `Present on ${formatDate()}`;
 
 const TABLE_HEAD = [
   { id: "name", label: "Name", alignRight: false },
@@ -50,7 +56,7 @@ const TABLE_HEAD = [
   { id: "gender", label: "Gender", alignRight: false },
   { id: "parentGurdian", label: "Parent/Gurdian", alignRight: false },
   { id: "parentContact", label: "Parent Contacts", alignRight: false },
-  { id: "present", label: presentOn, alignRight: false },
+  { id: "present", label: `Present on ${formatDate()}`, alignRight: false },
   { id: "history", label: "History", alignRight: false },
   // { id: '' },
 ];
@@ -98,33 +104,55 @@ export default function UserPage({ headtext }) {
 
   const [order, setOrder] = useState("asc");
 
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState("");
 
   const [orderBy, setOrderBy] = useState("name");
 
   const [filterName, setFilterName] = useState("");
+  const [checkHistory, setCheckHistory] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [historyData, sethistoryData] = useState([]);
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const isDesktop = useResponsive("up", "lg");
+
+  const [changedIsPresent, setchangedIsPresent] = useState("");
 
   useEffect(() => {
     //get all products
     const getAllChildren = async () => {
       await axios
-        .get(`http://localhost:5000/api/childrens/`)
+        .get(`${process.env.REACT_APP_Server_Url}children/`)
         .then((children) => {
-          setFilteredUsers(children.data);
-          console.log(children);
+          setFilteredUsers(
+            children?.data?.filter((item) =>
+              item?.childCategory
+                ?.toLowerCase()
+                .includes(headtext?.toLowerCase())
+            )
+          );
         })
         .catch((error) => {});
     };
 
     getAllChildren();
-  }, []);
+  }, [headtext, changedIsPresent]);
 
-  const handleOpenMenuHistory = (event) => {
-    setOpenHistory(event.currentTarget);
+  const handleOpenMenuHistory = async (event, id) => {
+    event.preventDefault();
+    setCheckHistory(id);
+    console.log(checkHistory);
+    if (checkHistory.trim().length === 0) {
+    } else {
+      await axios
+        .get(`${process.env.REACT_APP_Server_Url}history/${id}`)
+        .then((children) => {
+          console.log(children.data);
+          sethistoryData(children.data);
+          setOpenHistory(true);
+        })
+        .catch((error) => {});
+    }
   };
 
   const handleCloseMenuHistory = () => {
@@ -154,22 +182,10 @@ export default function UserPage({ headtext }) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    // const selectedIndex = selected.indexOf(name);
-    // let newSelected = [];
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name);
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1));
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1));
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1)
-    //   );
-    // }
-    // setSelected(newSelected);
+  const handleClick = (event, id) => {
+    event.preventDefault();
+    console.log(id);
+    setSelected(id);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -199,12 +215,6 @@ export default function UserPage({ headtext }) {
       ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
       : 0;
 
-  // const filteredUsers = applySortFilter(
-  //   filteredUsers,
-  //   getComparator(order, orderBy),
-  //   filterName
-  // );
-
   const isNotFound = !filteredUsers?.length && !!filterName;
   const heightRow = 100 * rowsPerPage + 5;
 
@@ -213,18 +223,47 @@ export default function UserPage({ headtext }) {
       <>
         <Box
           sx={{
-            width: "100%",
+            px: 0,
+            py: 0,
+            marginTop: -10,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
           <Typography
             variant="h3"
-            gutterBottom
-            sx={{ color: "#000099", display: "flex", alignContent: "center" }}
+            sx={{ color: "#000099", cursor: "pointer" }}
+            display={isDesktop ? "none" : "inline-block"}
+            onClick={openNav}
           >
-            Loading pleace wait...
+            <ViewHeadlineIcon />
           </Typography>
-          <LinearProgress />
         </Box>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: "10%",
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="ic_disabled" />}
+            sx={{ backgroundColor: "#000099" }}
+            onClick={handleOpenMenuAddNewPupil}
+          >
+            Add New Child
+          </Button>
+        </Box>
+        <AddNewPupil
+          open={Boolean(openAddNewPupil)}
+          handleCloseMenu={handleCloseMenuAddNewPupil}
+          headTextdata={headtext}
+        />
       </>
     );
   }
@@ -265,7 +304,12 @@ export default function UserPage({ headtext }) {
           </Typography>
         </Stack>
 
-        <Stack direction="row" alignItems="center" mb={0}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          mb={0}
+          sx={{ display: "flex", flexWrap: "wrap" }}
+        >
           <Typography variant="h4" gutterBottom>
             <UserListToolbar
               filterName={filterName}
@@ -279,7 +323,9 @@ export default function UserPage({ headtext }) {
               pr={5}
               sx={{ color: "#B6B6B4" }}
             >
-              33/45 Present Today
+              {`${getPresentToday(filteredUsers)}/${
+                filteredUsers?.length
+              } Present Today`}
             </Typography>
             <Typography
               variant="h5"
@@ -287,7 +333,7 @@ export default function UserPage({ headtext }) {
               pr={5}
               sx={{ color: "#B6B6B4" }}
             >
-              33/45 Present Today
+              {`33/${filteredUsers?.length} Present Today`}
             </Typography>
           </Stack>
         </Stack>
@@ -328,20 +374,20 @@ export default function UserPage({ headtext }) {
                       page * rowsPerPage + rowsPerPage
                     )
                     .map((row) => {
-                      const selectedUser = selected.indexOf(row.id) !== -1;
+                      const selectedUser = selected.indexOf(row._id) !== -1;
 
                       return (
                         <TableRow
                           hover
-                          key={row.id}
+                          key={row._id}
                           tabIndex={-1}
                           role="checkbox"
-                          selected={selectedUser}
+                          // selected={selectedUser}
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={selectedUser}
-                              onChange={(event) => handleClick(event, row.id)}
+                            // checked={selectedUser}
+                            // onChange={(event) => handleClick(event, row.id)}
                             />
                           </TableCell>
 
@@ -376,12 +422,14 @@ export default function UserPage({ headtext }) {
                             }}
                           >
                             <Checkbox
-                              name="remember"
-                              label="Remember me"
                               sx={{ borderRadius: 10 }}
-                              checked={selectedUser}
+                              checked={isPresent(row.attendance)}
                               onChange={(event) =>
-                                handleClick(event, row.childName)
+                                updateAttendanceIsPresent(
+                                  event,
+                                  row._id,
+                                  setchangedIsPresent
+                                )
                               }
                             />
                           </TableCell>
@@ -390,7 +438,9 @@ export default function UserPage({ headtext }) {
                             <IconButton
                               size="large"
                               color="inherit"
-                              onClick={handleOpenMenuHistory}
+                              onClick={(event) =>
+                                handleOpenMenuHistory(event, row._id)
+                              }
                             >
                               <HistoryToggleOffIcon />
                             </IconButton>
@@ -483,12 +533,12 @@ export default function UserPage({ headtext }) {
                           key={row.id}
                           tabIndex={-1}
                           role="checkbox"
-                          selected={selectedUser}
+                          // selected={selectedUser}
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={selectedUser}
-                              onChange={(event) => handleClick(event, row.id)}
+                            // checked={selectedUser}
+                            // onChange={(event) => handleClick(event, row.id)}
                             />
                           </TableCell>
 
@@ -525,9 +575,13 @@ export default function UserPage({ headtext }) {
                             <Checkbox
                               name="remember"
                               label="Remember me"
-                              checked={selectedUser}
+                              checked={isMissing(row.attendance)}
                               onChange={(event) =>
-                                handleClick(event, row.childName)
+                                updateAttendanceIsMissing(
+                                  event,
+                                  row._id,
+                                  setchangedIsPresent
+                                )
                               }
                             />
                           </TableCell>
@@ -536,7 +590,9 @@ export default function UserPage({ headtext }) {
                             <IconButton
                               size="large"
                               color="inherit"
-                              onClick={handleOpenMenuHistory}
+                              onClick={(event) =>
+                                handleOpenMenuHistory(event, row._id)
+                              }
                             >
                               <HistoryToggleOffIcon />
                             </IconButton>
@@ -591,12 +647,14 @@ export default function UserPage({ headtext }) {
         </Card>
       </Container>
       <NotificationsPopover
-        open={Boolean(openHistory)}
+        open={openHistory}
         handleCloseMenu={handleCloseMenuHistory}
+        searchData={historyData}
       />
       <AddNewPupil
         open={Boolean(openAddNewPupil)}
         handleCloseMenu={handleCloseMenuAddNewPupil}
+        headTextdata={headtext}
       />
     </>
   );
