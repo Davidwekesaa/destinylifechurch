@@ -1,15 +1,15 @@
 export const initialState = {
-  nav: localStorage.getItem('nav') ? localStorage.getItem('nav') : false,
+  nav: localStorage.getItem("nav") ? localStorage.getItem("nav") : false,
 
-  // user:
-  //   localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))
-  //     ? JSON.parse(localStorage.getItem('user'))
-  //     : null,
+  user:
+    localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"))
+      ? JSON.parse(localStorage.getItem("user"))
+      : null,
 };
 
 export const actionType = {
-  SET_NAV: 'SET_NAV',
-  SET_USER: 'SET_USER',
+  SET_NAV: "SET_NAV",
+  SET_USER: "SET_USER",
 };
 
 export const reducer = (state, action) => {

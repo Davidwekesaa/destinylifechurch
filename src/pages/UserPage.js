@@ -23,6 +23,7 @@ import {
   TablePagination,
   Divider,
   Box,
+  LinearProgress,
 } from "@mui/material";
 import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
 import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
@@ -31,7 +32,7 @@ import Scrollbar from "../components/scrollbar";
 // sections
 import { UserListHead, UserListToolbar } from "../sections/@dashboard/user";
 // mock
-import USERLIST from "../_mock/user";
+// import USERLIST from "../_mock/user";
 import NotificationsPopover from "../layouts/dashboard/header/NotificationsPopover";
 import AddNewPupil from "../layouts/dashboard/header/AddNewPupil";
 import useResponsive from "../hooks/useResponsive";
@@ -146,7 +147,7 @@ export default function UserPage({ headtext }) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = filteredUsers.map((n) => n.childName);
       setSelected(newSelecteds);
       return;
     }
@@ -194,10 +195,12 @@ export default function UserPage({ headtext }) {
   };
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+    page > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
+      : 0;
 
   // const filteredUsers = applySortFilter(
-  //   USERLIST,
+  //   filteredUsers,
   //   getComparator(order, orderBy),
   //   filterName
   // );
@@ -208,7 +211,20 @@ export default function UserPage({ headtext }) {
   if (filteredUsers.length === 0) {
     return (
       <>
-        <p>wait</p>
+        <Box
+          sx={{
+            width: "100%",
+          }}
+        >
+          <Typography
+            variant="h3"
+            gutterBottom
+            sx={{ color: "#000099", display: "flex", alignContent: "center" }}
+          >
+            Loading pleace wait...
+          </Typography>
+          <LinearProgress />
+        </Box>
       </>
     );
   }
@@ -300,7 +316,7 @@ export default function UserPage({ headtext }) {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={filteredUsers?.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -312,16 +328,6 @@ export default function UserPage({ headtext }) {
                       page * rowsPerPage + rowsPerPage
                     )
                     .map((row) => {
-                      // const {
-                      //   id:row.id,
-                      //   name,
-                      //   avatarUrl,
-                      //   age,
-                      //   gender,
-                      //   parent,
-                      //   parentcontact,
-                      //   date,
-                      // } = row;
                       const selectedUser = selected.indexOf(row.id) !== -1;
 
                       return (
@@ -430,7 +436,7 @@ export default function UserPage({ headtext }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={filteredUsers?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -457,7 +463,7 @@ export default function UserPage({ headtext }) {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={filteredUsers.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -469,16 +475,6 @@ export default function UserPage({ headtext }) {
                       page * rowsPerPage + rowsPerPage
                     )
                     .map((row) => {
-                      // const {
-                      //   id,
-                      //   name,
-                      //   avatarUrl,
-                      //   age,
-                      //   gender,
-                      //   parent,
-                      //   parentcontact,
-                      //   date,
-                      // } = row;
                       const selectedUser = selected.indexOf(row.id) !== -1;
 
                       return (
@@ -586,7 +582,7 @@ export default function UserPage({ headtext }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={filteredUsers?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
