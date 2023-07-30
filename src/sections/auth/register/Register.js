@@ -20,7 +20,7 @@ import axios from "axios";
 // ----------------------------------------------------------------------
 
 export default function Register() {
-  const [dispatch] = useStateValue();
+  const [{}, dispatch] = useStateValue();
   const [userName, setuserName] = useState("");
   const [userEmail, setuserEmail] = useState("");
   const [userPassword, setuserPassword] = useState("");

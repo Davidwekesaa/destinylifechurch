@@ -76,7 +76,6 @@ export default function UserListToolbar({
               />
             </InputAdornment>
           }
-          sx={{ width: "100%" }}
         />
       )}
 

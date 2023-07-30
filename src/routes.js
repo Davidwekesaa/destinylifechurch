@@ -1,5 +1,6 @@
-import React from "react";
-import { Navigate, useRoutes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, useRoutes, useNavigate } from "react-router-dom";
+
 // layouts
 import DashboardLayout from "./layouts/dashboard";
 import SimpleLayout from "./layouts/simple";
@@ -8,10 +9,23 @@ import UserPage from "./pages/UserPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Page404 from "./pages/Page404";
+import { useStateValue } from "./store/StateProvider";
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const [{ user }, dispatch] = useStateValue();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const getAllCategory = () => {
+      if (!user) {
+        navigate("/login", { replace: true });
+      }
+    };
+
+    getAllCategory();
+  }, []);
+
   const routes = useRoutes([
     {
       path: "/dashboard",

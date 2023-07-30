@@ -45,7 +45,7 @@ Nav.propTypes = {
 };
 
 export default function Nav() {
-  const [{ nav }, dispatch] = useStateValue();
+  const [{ nav, user }, dispatch] = useStateValue();
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive("up", "lg");
@@ -56,6 +56,12 @@ export default function Nav() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  const hundleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
 
   const onCloseNav = () => {
     localStorage.setItem("nav", !nav);
@@ -97,14 +103,29 @@ export default function Nav() {
           <StyledAccount>
             {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
 
-            <Box sx={{ ml: 2 }}>
-              {/* <Typography variant="subtitle2" sx={{ color: "text.primary" }}>
-                {account.displayName}
+            <Box
+              sx={{
+                ml: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{ color: "text.primary", marginRight: 10 }}
+              >
+                {user?.userName}
               </Typography>
 
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                {account.role}
-              </Typography> */}
+              <Typography
+                variant="body2"
+                sx={{ color: "#000099", cursor: "pointer" }}
+                onClick={hundleLogout}
+              >
+                Logout
+              </Typography>
             </Box>
           </StyledAccount>
         </Link>
