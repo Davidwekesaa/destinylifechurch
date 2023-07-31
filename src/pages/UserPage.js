@@ -24,6 +24,7 @@ import {
   Divider,
   Box,
   LinearProgress,
+  TextField,
 } from "@mui/material";
 import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
 import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
@@ -45,6 +46,7 @@ import {
   isPresent,
   updateAttendanceIsPresent,
   updateAttendanceIsMissing,
+  returnFirstLetter,
 } from "../utils/userPageFunctions";
 import axios from "axios";
 
@@ -118,6 +120,9 @@ export default function UserPage({ headtext }) {
 
   const [changedIsPresent, setchangedIsPresent] = useState("");
 
+  const [search, setSearch] = useState("");
+  const [searchUsers, setSearchUsers] = useState([]);
+
   useEffect(() => {
     //get all products
     const getAllChildren = async () => {
@@ -138,6 +143,14 @@ export default function UserPage({ headtext }) {
     getAllChildren();
   }, [headtext, changedIsPresent]);
 
+  //serch
+  useEffect(() => {
+    setSearchUsers(
+      filteredUsers.filter((child) =>
+        child.childName.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  }, [search, changedIsPresent]);
   const handleOpenMenuHistory = async (event, id) => {
     event.preventDefault();
     setCheckHistory(id);
@@ -305,15 +318,31 @@ export default function UserPage({ headtext }) {
         </Stack>
 
         <Stack
-          direction="row"
-          alignItems="center"
           mb={0}
-          sx={{ display: "flex", flexWrap: "wrap" }}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-          <Typography variant="h4" gutterBottom>
-            <UserListToolbar
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ width: "40%", marginRight: 10 }}
+          >
+            {/* <UserListToolbar
               filterName={filterName}
               onFilterName={handleFilterByName}
+            /> */}
+
+            <TextField
+              name="search"
+              placeholder="Search by child name.."
+              // label="User Name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{ width: "100%" }}
             />
           </Typography>
           <Stack direction="row" alignItems="center" mb={0}>
@@ -368,86 +397,179 @@ export default function UserPage({ headtext }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers
-                    ?.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    .map((row) => {
-                      const selectedUser = selected.indexOf(row._id) !== -1;
-
-                      return (
-                        <TableRow
-                          hover
-                          key={row._id}
-                          tabIndex={-1}
-                          role="checkbox"
-                          // selected={selectedUser}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                            // checked={selectedUser}
-                            // onChange={(event) => handleClick(event, row.id)}
-                            />
-                          </TableCell>
-
-                          <TableCell component="th" scope="row" padding="none">
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              spacing={2}
+                  {search.trim().length != 0 && searchUsers?.length != 0
+                    ? searchUsers
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <TableRow
+                              hover
+                              key={row._id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              // selected={selectedUser}
                             >
-                              <Typography variant="subtitle2" noWrap>
-                                {row.childName}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                // checked={selectedUser}
+                                // onChange={(event) => handleClick(event, row.id)}
+                                />
+                              </TableCell>
 
-                          <TableCell align="left">{row.childAge}</TableCell>
+                              <TableCell
+                                component="th"
+                                scope="row"
+                                padding="none"
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Typography variant="subtitle2" noWrap>
+                                    {row.childName}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
 
-                          <TableCell align="left">{row.childGender}</TableCell>
+                              <TableCell align="left">{row.childAge}</TableCell>
 
-                          <TableCell align="left">{row.parentName}</TableCell>
+                              <TableCell align="left">
+                                {returnFirstLetter(row.childGender)}
+                              </TableCell>
 
-                          <TableCell align="left">
-                            {row.parentContact}
-                          </TableCell>
+                              <TableCell align="left">
+                                {row.parentName}
+                              </TableCell>
 
-                          <TableCell
-                            align="left"
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Checkbox
-                              sx={{ borderRadius: 10 }}
-                              checked={isPresent(row.attendance)}
-                              onChange={(event) =>
-                                updateAttendanceIsPresent(
-                                  event,
-                                  row._id,
-                                  setchangedIsPresent
-                                )
-                              }
-                            />
-                          </TableCell>
+                              <TableCell align="left">
+                                {row.parentContact}
+                              </TableCell>
 
-                          <TableCell align="left">
-                            <IconButton
-                              size="large"
-                              color="inherit"
-                              onClick={(event) =>
-                                handleOpenMenuHistory(event, row._id)
-                              }
+                              <TableCell
+                                align="left"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Checkbox
+                                  sx={{ borderRadius: 10 }}
+                                  checked={isPresent(row.attendance)}
+                                  onChange={(event) =>
+                                    updateAttendanceIsPresent(
+                                      event,
+                                      row._id,
+                                      setchangedIsPresent
+                                    )
+                                  }
+                                />
+                              </TableCell>
+
+                              <TableCell align="left">
+                                <IconButton
+                                  size="large"
+                                  color="inherit"
+                                  onClick={(event) =>
+                                    handleOpenMenuHistory(event, row._id)
+                                  }
+                                >
+                                  <HistoryToggleOffIcon />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    : filteredUsers
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <TableRow
+                              hover
+                              key={row._id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              // selected={selectedUser}
                             >
-                              <HistoryToggleOffIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                // checked={selectedUser}
+                                // onChange={(event) => handleClick(event, row.id)}
+                                />
+                              </TableCell>
+
+                              <TableCell
+                                component="th"
+                                scope="row"
+                                padding="none"
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Typography variant="subtitle2" noWrap>
+                                    {row.childName}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell align="left">{row.childAge}</TableCell>
+
+                              <TableCell align="left">
+                                {returnFirstLetter(row.childGender)}
+                              </TableCell>
+
+                              <TableCell align="left">
+                                {row.parentName}
+                              </TableCell>
+
+                              <TableCell align="left">
+                                {row.parentContact}
+                              </TableCell>
+
+                              <TableCell
+                                align="left"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Checkbox
+                                  sx={{ borderRadius: 10 }}
+                                  checked={isPresent(row.attendance)}
+                                  onChange={(event) =>
+                                    updateAttendanceIsPresent(
+                                      event,
+                                      row._id,
+                                      setchangedIsPresent
+                                    )
+                                  }
+                                />
+                              </TableCell>
+
+                              <TableCell align="left">
+                                <IconButton
+                                  size="large"
+                                  color="inherit"
+                                  onClick={(event) =>
+                                    handleOpenMenuHistory(event, row._id)
+                                  }
+                                >
+                                  <HistoryToggleOffIcon />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
@@ -519,87 +641,181 @@ export default function UserPage({ headtext }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers
-                    ?.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    .map((row) => {
-                      const selectedUser = selected.indexOf(row.id) !== -1;
-
-                      return (
-                        <TableRow
-                          hover
-                          key={row.id}
-                          tabIndex={-1}
-                          role="checkbox"
-                          // selected={selectedUser}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                            // checked={selectedUser}
-                            // onChange={(event) => handleClick(event, row.id)}
-                            />
-                          </TableCell>
-
-                          <TableCell component="th" scope="row" padding="none">
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              spacing={2}
+                  {search.trim().length != 0 && searchUsers?.length != 0
+                    ? searchUsers
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <TableRow
+                              hover
+                              key={row.id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              // selected={selectedUser}
                             >
-                              <Typography variant="subtitle2" noWrap>
-                                {row.childName}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                // checked={selectedUser}
+                                // onChange={(event) => handleClick(event, row.id)}
+                                />
+                              </TableCell>
 
-                          <TableCell align="left">{row.childAge}</TableCell>
+                              <TableCell
+                                component="th"
+                                scope="row"
+                                padding="none"
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Typography variant="subtitle2" noWrap>
+                                    {row.childName}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
 
-                          <TableCell align="left">{row.childGender}</TableCell>
+                              <TableCell align="left">{row.childAge}</TableCell>
 
-                          <TableCell align="left">{row.parentName}</TableCell>
+                              <TableCell align="left">
+                                {returnFirstLetter(row.childGender)}
+                              </TableCell>
 
-                          <TableCell align="left">
-                            {row.parentContact}
-                          </TableCell>
+                              <TableCell align="left">
+                                {row.parentName}
+                              </TableCell>
 
-                          <TableCell
-                            align="left"
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Checkbox
-                              name="remember"
-                              label="Remember me"
-                              checked={isMissing(row.attendance)}
-                              onChange={(event) =>
-                                updateAttendanceIsMissing(
-                                  event,
-                                  row._id,
-                                  setchangedIsPresent
-                                )
-                              }
-                            />
-                          </TableCell>
+                              <TableCell align="left">
+                                {row.parentContact}
+                              </TableCell>
 
-                          <TableCell align="left">
-                            <IconButton
-                              size="large"
-                              color="inherit"
-                              onClick={(event) =>
-                                handleOpenMenuHistory(event, row._id)
-                              }
+                              <TableCell
+                                align="left"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Checkbox
+                                  name="remember"
+                                  label="Remember me"
+                                  checked={isMissing(row.attendance)}
+                                  onChange={(event) =>
+                                    updateAttendanceIsMissing(
+                                      event,
+                                      row._id,
+                                      setchangedIsPresent
+                                    )
+                                  }
+                                />
+                              </TableCell>
+
+                              <TableCell align="left">
+                                <IconButton
+                                  size="large"
+                                  color="inherit"
+                                  onClick={(event) =>
+                                    handleOpenMenuHistory(event, row._id)
+                                  }
+                                >
+                                  <HistoryToggleOffIcon />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    : filteredUsers
+                        ?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((row) => {
+                          return (
+                            <TableRow
+                              hover
+                              key={row.id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              // selected={selectedUser}
                             >
-                              <HistoryToggleOffIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                // checked={selectedUser}
+                                // onChange={(event) => handleClick(event, row.id)}
+                                />
+                              </TableCell>
+
+                              <TableCell
+                                component="th"
+                                scope="row"
+                                padding="none"
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Typography variant="subtitle2" noWrap>
+                                    {row.childName}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell align="left">{row.childAge}</TableCell>
+
+                              <TableCell align="left">
+                                {returnFirstLetter(row.childGender)}
+                              </TableCell>
+
+                              <TableCell align="left">
+                                {row.parentName}
+                              </TableCell>
+
+                              <TableCell align="left">
+                                {row.parentContact}
+                              </TableCell>
+
+                              <TableCell
+                                align="left"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Checkbox
+                                  name="remember"
+                                  label="Remember me"
+                                  checked={isMissing(row.attendance)}
+                                  onChange={(event) =>
+                                    updateAttendanceIsMissing(
+                                      event,
+                                      row._id,
+                                      setchangedIsPresent
+                                    )
+                                  }
+                                />
+                              </TableCell>
+
+                              <TableCell align="left">
+                                <IconButton
+                                  size="large"
+                                  color="inherit"
+                                  onClick={(event) =>
+                                    handleOpenMenuHistory(event, row._id)
+                                  }
+                                >
+                                  <HistoryToggleOffIcon />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />

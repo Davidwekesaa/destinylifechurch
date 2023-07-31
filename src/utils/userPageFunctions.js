@@ -72,3 +72,8 @@ export const updateAttendanceIsMissing = async (e, id, setchangedIsPresent) => {
     })
     .catch((error) => {});
 };
+
+export function returnFirstLetter(name) {
+  const firstLetter = name[0].toUpperCase();
+  return firstLetter;
+}
