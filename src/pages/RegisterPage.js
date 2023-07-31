@@ -53,7 +53,7 @@ export default function RegisterPage() {
   return (
     <>
       <Helmet>
-        <title> Destiny Life Church | Login </title>
+        <title> Destiny Life Church | Register </title>
       </Helmet>
 
       <StyledRoot>
