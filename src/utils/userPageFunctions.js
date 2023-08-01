@@ -77,3 +77,24 @@ export function returnFirstLetter(name) {
   const firstLetter = name[0].toUpperCase();
   return firstLetter;
 }
+
+export function getPresentLastWeek(filteredUsers) {
+  var presentLastWeek = 0;
+  filteredUsers?.map((data) => {
+    if (
+      data?.attendance?.length === 1 &&
+      data?.attendance[data?.attendance?.length - 1]?.present &&
+      data?.attendance[data?.attendance?.length - 1]?.date != formatDate()
+    ) {
+      presentLastWeek += 1;
+    } else if (
+      data?.attendance?.length > 1 &&
+      data?.attendance[data?.attendance?.length - 2]?.present &&
+      data?.attendance[data?.attendance?.length - 2]?.date != formatDate()
+    ) {
+      presentLastWeek += 1;
+    }
+  });
+
+  return presentLastWeek;
+}

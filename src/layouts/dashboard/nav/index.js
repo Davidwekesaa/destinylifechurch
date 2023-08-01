@@ -24,6 +24,7 @@ import NavSection from "../../../components/nav-section";
 import navConfig from "./config";
 import { useStateValue } from "../../../store/StateProvider";
 import { actionType } from "../../../store/reducer";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 // ----------------------------------------------------------------------
 
@@ -137,7 +138,10 @@ export default function Nav() {
 
       <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
         {/* <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}> */}
-        <Button>Settings</Button>
+
+        <Button>
+          <SettingsIcon /> Settings
+        </Button>
         {/* <Logo /> */}
         {/* </Stack> */}
       </Box>

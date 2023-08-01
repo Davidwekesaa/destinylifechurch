@@ -26,6 +26,7 @@ import {
   LinearProgress,
   TextField,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
 import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
 import Iconify from "../components/iconify";
@@ -47,8 +48,10 @@ import {
   updateAttendanceIsPresent,
   updateAttendanceIsMissing,
   returnFirstLetter,
+  getPresentLastWeek,
 } from "../utils/userPageFunctions";
 import axios from "axios";
+import Logo from "../components/logo/Logo";
 
 // ----------------------------------------------------------------------
 
@@ -139,7 +142,6 @@ export default function UserPage({ headtext }) {
         })
         .catch((error) => {});
     };
-
     getAllChildren();
   }, [headtext, changedIsPresent]);
 
@@ -263,12 +265,14 @@ export default function UserPage({ headtext }) {
             marginTop: "10%",
           }}
         >
+          <Logo />
           <Button
             variant="contained"
             startIcon={<Iconify icon="ic_disabled" />}
-            sx={{ backgroundColor: "#000099" }}
+            sx={{ backgroundColor: "#000099", marginTop: 5 }}
             onClick={handleOpenMenuAddNewPupil}
           >
+            <AddIcon />
             Add New Child
           </Button>
         </Box>
@@ -362,7 +366,9 @@ export default function UserPage({ headtext }) {
               pr={5}
               sx={{ color: "#B6B6B4" }}
             >
-              {`33/${filteredUsers?.length} Present Today`}
+              {`${getPresentLastWeek(filteredUsers)}/${
+                filteredUsers?.length
+              } Present Last Week`}
             </Typography>
           </Stack>
         </Stack>
@@ -380,7 +386,7 @@ export default function UserPage({ headtext }) {
             sx={{ backgroundColor: "#000099" }}
             onClick={handleOpenMenuAddNewPupil}
           >
-            Add New Child
+            <AddIcon /> Add New Child
           </Button>
         </Stack>
         <Card>
