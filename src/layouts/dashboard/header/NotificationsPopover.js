@@ -123,11 +123,11 @@ export default function NotificationsPopover({
 
         <Divider sx={{ borderStyle: "dashed" }} />
 
-        <Box sx={{ p: 1 }}>
+        {/* <Box sx={{ p: 1 }}>
           <Button fullWidth disableRipple>
             View All
           </Button>
-        </Box>
+        </Box> */}
       </Popover>
     </>
   );

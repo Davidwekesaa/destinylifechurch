@@ -49,6 +49,8 @@ import {
   updateAttendanceIsMissing,
   returnFirstLetter,
   getPresentLastWeek,
+  calculateAge,
+  chooseFunction,
 } from "../utils/userPageFunctions";
 import axios from "axios";
 import Logo from "../components/logo/Logo";
@@ -225,6 +227,7 @@ export default function UserPage({ headtext }) {
     });
   };
 
+  console.log(formatDate());
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
@@ -441,18 +444,20 @@ export default function UserPage({ headtext }) {
                                 </Stack>
                               </TableCell>
 
-                              <TableCell align="left">{row.childAge}</TableCell>
+                              <TableCell align="left">
+                                {calculateAge(row.DOB)}
+                              </TableCell>
 
                               <TableCell align="left">
                                 {returnFirstLetter(row.childGender)}
                               </TableCell>
 
                               <TableCell align="left">
-                                {row.parentName}
+                                {` ${row?.fatherName} / ${row?.parentName} `}
                               </TableCell>
 
                               <TableCell align="left">
-                                {row.parentContact}
+                                {`${row.fatherContact} / ${row.parentContact}`}
                               </TableCell>
 
                               <TableCell
@@ -527,18 +532,21 @@ export default function UserPage({ headtext }) {
                                 </Stack>
                               </TableCell>
 
-                              <TableCell align="left">{row.childAge}</TableCell>
+                              <TableCell align="left">
+                                {" "}
+                                {calculateAge(row.DOB)}
+                              </TableCell>
 
                               <TableCell align="left">
                                 {returnFirstLetter(row.childGender)}
                               </TableCell>
 
                               <TableCell align="left">
-                                {row.parentName}
+                                {` ${row?.fatherName} / ${row?.parentName} `}
                               </TableCell>
 
                               <TableCell align="left">
-                                {row.parentContact}
+                                {`${row.fatherContact} / ${row.parentContact}`}
                               </TableCell>
 
                               <TableCell
@@ -553,10 +561,11 @@ export default function UserPage({ headtext }) {
                                   sx={{ borderRadius: 10 }}
                                   checked={isPresent(row.attendance)}
                                   onChange={(event) =>
-                                    updateAttendanceIsPresent(
+                                    chooseFunction(
                                       event,
                                       row._id,
-                                      setchangedIsPresent
+                                      setchangedIsPresent,
+                                      isPresent(row.attendance)
                                     )
                                   }
                                 />
@@ -622,7 +631,7 @@ export default function UserPage({ headtext }) {
           />
         </Card>
         {/* missing redister */}
-        <Stack
+        {/* <Stack
           direction="row"
           alignItems="center"
           justifyContent="space-between"
@@ -866,7 +875,7 @@ export default function UserPage({ headtext }) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Card>
+        </Card> */}
       </Container>
       <NotificationsPopover
         open={openHistory}

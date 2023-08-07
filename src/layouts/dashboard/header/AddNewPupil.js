@@ -22,6 +22,10 @@ import {
   TextField,
   Checkbox,
   Stack,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Select,
 } from "@mui/material";
 // utils
 import { fToNow } from "../../../utils/formatTime";
@@ -30,23 +34,34 @@ import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
+import dayjs from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers";
+import { formatPickedDate } from "../../../utils/userPageFunctions";
 
 // ----------------------------------------------------------------------
 
 function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
+  const [fName, setFname] = useState("");
+  const [fContact, setFContact] = useState("");
+
   const [pName, setPname] = useState("");
   const [pContact, setpContact] = useState("");
+
   const [relationShip, setRelationShip] = useState("");
 
   const [cName, setCname] = useState("");
   const [cGender, setcGender] = useState("");
   const [age, setAge] = useState("");
-  const [cCategory, setcCategory] = useState("");
+
+  const [visitor, setVisitor] = useState(false);
   const emptyFields = () => toast.error("All the fields are required");
 
-  useEffect(() => {
-    setcCategory(headTextdata);
-  }, [headTextdata]);
+  // useEffect(() => {
+  //   setcCategory(headTextdata);
+  // }, [headTextdata]);
 
   const setEmptyFields = () => {
     setPname("");
@@ -55,7 +70,8 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
     setCname("");
     setcGender("");
     setAge("");
-    setcCategory("");
+    setFname("");
+    setFContact("");
   };
 
   const addNewPupill = async () => {
@@ -65,22 +81,24 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
       relationShip.trim().length === 0 ||
       cName.trim().length === 0 ||
       cGender.trim().length === 0 ||
-      age.trim().length === 0 ||
-      cCategory.trim().length === 0
+      age?.length === 0 ||
+      fName.trim().length === 0 ||
+      fContact.trim().length === 0
     ) {
       console.log("empty");
-      emptyFields();
+      // emptyFields();
     } else {
       await axios
-        .post(`http://localhost:5000/api/children/`, {
+        .post(`${process.env.REACT_APP_Server_Url}children/`, {
           parentName: pName,
           parentContact: pContact,
+          fatherName: fName,
+          fatherContact: fContact,
           Relationship: relationShip,
           childName: cName,
           childGender: cGender,
-          DOB: "",
-          childAge: age,
-          childCategory: cCategory.toLowerCase(),
+          DOB: formatPickedDate(age),
+          visitor: visitor,
         })
         .then((logins) => {
           setEmptyFields();
@@ -147,8 +165,24 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
             }}
           >
             <TextField
+              name="fname"
+              label="Father's name"
+              sx={{ marginBottom: 2 }}
+              required
+              value={fName}
+              onChange={(e) => setFname(e.target.value)}
+            />
+            <TextField
+              name="fcontact"
+              label="Father's Contact"
+              sx={{ marginBottom: 2 }}
+              required
+              onChange={(e) => setFContact(e.target.value)}
+              value={fContact}
+            />
+            <TextField
               name="pname"
-              label="Name"
+              label="Mother's Name"
               sx={{ marginBottom: 2 }}
               required
               value={pName}
@@ -156,12 +190,13 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
             />
             <TextField
               name="pcontact"
-              label="Contact"
+              label="Mother's Contact"
               sx={{ marginBottom: 2 }}
               required
               onChange={(e) => setpContact(e.target.value)}
               value={pContact}
             />
+
             <TextField
               name="prelationship"
               label="Relationship"
@@ -198,23 +233,45 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
               onChange={(e) => setCname(e.target.value)}
               value={cName}
             />
-            <TextField
-              name="cgender"
-              label="Gender"
-              sx={{ marginBottom: 2 }}
-              required
-              onChange={(e) => setcGender(e.target.value)}
-              value={cGender}
-            />
-            <TextField
-              name="cAge"
-              label="Age"
-              sx={{ marginBottom: 2 }}
-              required
-              onChange={(e) => setAge(e.target.value)}
-              value={age}
-            />
-            <TextField
+
+            <FormControl
+              sx={{
+                width: "217px",
+                height: 50,
+                marginBottom: 2,
+              }}
+              size="small"
+            >
+              <InputLabel id="demo-select-small-label">Gender</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={cGender}
+                label="Gender"
+                onChange={(e) => setcGender(e.target.value)}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <MenuItem value="">
+                  <em></em>
+                </MenuItem>
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+              </Select>
+            </FormControl>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoContainer components={["DatePicker", "DatePicker"]}>
+                <DatePicker
+                  label="Date of Birth"
+                  sx={{ marginBottom: 2, width: "217px" }}
+                  value={age}
+                  onChange={(newDate) => setAge(newDate)}
+                />
+              </DemoContainer>
+            </LocalizationProvider>
+            {/* <TextField
               name="cCategory"
               label="Category"
               placeholder="eg dazzlers"
@@ -223,7 +280,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
               // onChange={(e) => setcCategory(headText)}
               value={cCategory}
               disabled={true}
-            />
+            /> */}
 
             <Box
               sx={{
@@ -243,7 +300,12 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                   Visitor?
                 </Typography>
               </Stack>
-              <Checkbox name="remember" label="Remember me" />
+              <Checkbox
+                name="remember"
+                label="Remember me"
+                value={visitor}
+                onChange={(e) => setVisitor(!visitor)}
+              />
             </Box>
           </Box>
         </Box>

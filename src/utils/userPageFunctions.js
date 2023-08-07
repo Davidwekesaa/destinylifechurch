@@ -3,7 +3,7 @@ import axios from "axios";
 export function formatDate() {
   const date = new Date(); // Replace this with your date object
   const options = {
-    year: "2-digit",
+    year: "numeric",
     month: "2-digit",
     day: "2-digit",
   };
@@ -98,3 +98,49 @@ export function getPresentLastWeek(filteredUsers) {
 
   return presentLastWeek;
 }
+
+export const formatPickedDate = (date) => {
+  const inputDate = new Date(date);
+
+  const day = inputDate.getUTCDate();
+  const month = inputDate.getUTCMonth() + 1; // Adding 1 since months are 0-based
+  const year = inputDate.getUTCFullYear();
+
+  const formattedDate = `${day.toString().padStart(2, "0")}/${month
+    .toString()
+    .padStart(2, "0")}/${year}`;
+
+  return formattedDate;
+};
+
+export const calculateAge = (birthdateStr) => {
+  const birthdate = parseDate(birthdateStr);
+  const currentDate = new Date(formatDate());
+
+  const yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
+  const birthMonth = birthdate.getMonth();
+  const currentMonth = currentDate.getMonth();
+
+  if (
+    currentMonth < birthMonth ||
+    (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())
+  ) {
+    return yearsDiff - 1; // Adjust age if birthdate hasn't occurred yet this year
+  }
+
+  return yearsDiff;
+};
+
+function parseDate(dateStr) {
+  const parts = dateStr.split("/");
+  return new Date(parts[2], parts[1] - 1, parts[0]);
+}
+
+export const chooseFunction = (e, id, setchangedIsPresent, isPresent) => {
+  e.preventDefault();
+  if (isPresent) {
+    updateAttendanceIsMissing(e, id, setchangedIsPresent);
+  } else {
+    updateAttendanceIsPresent(e, id, setchangedIsPresent);
+  }
+};
