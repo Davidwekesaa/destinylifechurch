@@ -13,10 +13,11 @@ import { LoadingButton } from "@mui/lab";
 // components
 import Iconify from "../../../components/iconify";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { actionType } from "../../../store/reducer";
 import { useStateValue } from "../../../store/StateProvider";
 import axios from "axios";
-
+import Logging from "../../../layouts/dashboard/header/Logging";
 // ----------------------------------------------------------------------
 
 export default function Register() {
@@ -24,11 +25,17 @@ export default function Register() {
   const [userName, setuserName] = useState("");
   const [userEmail, setuserEmail] = useState("");
   const [userPassword, setuserPassword] = useState("");
+  const [openLoading, setOpenLoading] = useState(null);
   const navigate = useNavigate();
+
   const emptyFields = () => toast.error("All the fields are required");
   const wronUser = () => toast.error("An Error Occured");
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleCloseLoging = () => {
+    setOpenLoading(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +46,7 @@ export default function Register() {
     ) {
       emptyFields();
     } else {
+      setOpenLoading(true);
       await axios
         .post(`${process.env.REACT_APP_Server_Url}auth/register`, {
           userEmail: userEmail,
@@ -51,10 +59,11 @@ export default function Register() {
             type: actionType.SET_USER,
             user: logins.data,
           });
-          console.log(logins);
+          setOpenLoading(null);
           navigate("/dashboard", { replace: true });
         })
         .catch((error) => {
+          setOpenLoading(null);
           wronUser();
         });
     }
@@ -121,6 +130,12 @@ export default function Register() {
         Register
       </LoadingButton>
       {/* <ToastContainer /> */}
+      <Logging
+        open={Boolean(openLoading)}
+        handleCloseMenu={handleCloseLoging}
+        // headTextdata={headtext}
+      />
+      <ToastContainer />
     </>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 // @mui
 import {
@@ -15,6 +17,7 @@ import Iconify from "../../../components/iconify";
 import { actionType } from "../../../store/reducer";
 import { useStateValue } from "../../../store/StateProvider";
 import axios from "axios";
+import Logging from "../../../layouts/dashboard/header/Logging";
 
 // ----------------------------------------------------------------------
 
@@ -24,12 +27,21 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [openLoading, setOpenLoading] = useState(null);
+
+  const emptyFields = () => toast.error("All the fields are required");
+  const wronUser = () => toast.error("Wrong user email or password");
+
+  const handleCloseLoging = () => {
+    setOpenLoading(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email.trim().length === 0 && password.trim().length === 0) {
-      // emptyFields();
+    if (email.trim().length === 0 || password.trim().length === 0) {
+      emptyFields();
     } else {
+      setOpenLoading(true);
       await axios
         .post(`${process.env.REACT_APP_Server_Url}auth/login`, {
           userEmail: email,
@@ -41,10 +53,12 @@ export default function LoginForm() {
             type: actionType.SET_USER,
             user: logins.data,
           });
+          setOpenLoading(null);
           navigate("/dashboard", { replace: true });
         })
         .catch((error) => {
-          // wronUser();
+          setOpenLoading(null);
+          wronUser();
         });
     }
   };
@@ -113,6 +127,12 @@ export default function LoginForm() {
       >
         Login
       </LoadingButton>
+      <Logging
+        open={Boolean(openLoading)}
+        handleCloseMenu={handleCloseLoging}
+        // headTextdata={headtext}
+      />
+      <ToastContainer />
     </>
   );
 }

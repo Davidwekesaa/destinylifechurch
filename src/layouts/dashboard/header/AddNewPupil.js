@@ -1,7 +1,3 @@
-import PropTypes from "prop-types";
-import { set, sub } from "date-fns";
-import { noCase } from "change-case";
-import { faker } from "@faker-js/faker";
 import { useState, useEffect } from "react";
 // @mui
 import {
@@ -28,11 +24,11 @@ import {
   Select,
 } from "@mui/material";
 // utils
-import { fToNow } from "../../../utils/formatTime";
+
 // components
-import Iconify from "../../../components/iconify";
-import Scrollbar from "../../../components/scrollbar";
+
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -40,6 +36,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import { formatPickedDate } from "../../../utils/userPageFunctions";
+import Logging from "./Logging";
 
 // ----------------------------------------------------------------------
 
@@ -57,7 +54,12 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   const [age, setAge] = useState("");
 
   const [visitor, setVisitor] = useState(false);
+
+  const [openLoading, setOpenLoading] = useState(null);
+
   const emptyFields = () => toast.error("All the fields are required");
+  const errorr = () => toast.error("There was error");
+  const su = () => toast.success("Record added successful");
 
   // useEffect(() => {
   //   setcCategory(headTextdata);
@@ -85,9 +87,9 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
       fName.trim().length === 0 ||
       fContact.trim().length === 0
     ) {
-      console.log("empty");
-      // emptyFields();
+      emptyFields();
     } else {
+      setOpenLoading(true);
       await axios
         .post(`${process.env.REACT_APP_Server_Url}children/`, {
           parentName: pName,
@@ -101,9 +103,20 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
           visitor: visitor,
         })
         .then((logins) => {
+          su();
           setEmptyFields();
+          setOpenLoading(null);
+          handleCloseMenu();
+        })
+        .catch((error) => {
+          setOpenLoading(null);
+          errorr();
         });
     }
+  };
+
+  const handleCloseLoging = () => {
+    setOpenLoading(null);
   };
   return (
     <>
@@ -321,6 +334,11 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
         </Box>
       </Popover>
       <ToastContainer />
+      <Logging
+        open={Boolean(openLoading)}
+        handleCloseMenu={handleCloseLoging}
+        // headTextdata={headtext}
+      />
     </>
   );
 }

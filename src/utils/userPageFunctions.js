@@ -114,6 +114,22 @@ export const formatPickedDate = (date) => {
 };
 
 export const calculateAge = (birthdateStr) => {
+  // const birthdate = parseDate(birthdateStr);
+  // const currentDate = new Date(formatDate());
+
+  // const yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
+  // const birthMonth = birthdate.getMonth();
+  // const currentMonth = currentDate.getMonth();
+
+  // if (
+  //   currentMonth < birthMonth ||
+  //   (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())
+  // ) {
+  //   return yearsDiff - 1; // Adjust age if birthdate hasn't occurred yet this year
+  // }
+
+  // return `${yearsDiff} year(s)`;
+
   const birthdate = parseDate(birthdateStr);
   const currentDate = new Date(formatDate());
 
@@ -121,14 +137,30 @@ export const calculateAge = (birthdateStr) => {
   const birthMonth = birthdate.getMonth();
   const currentMonth = currentDate.getMonth();
 
+  let monthsDiff = currentMonth - birthMonth;
+
+  if (monthsDiff < 0) {
+    monthsDiff += 12;
+  }
+
   if (
     currentMonth < birthMonth ||
     (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())
   ) {
-    return yearsDiff - 1; // Adjust age if birthdate hasn't occurred yet this year
+    yearsDiff--; // Adjust years if birthdate hasn't occurred yet this year
   }
 
-  return yearsDiff;
+  if (yearsDiff === 0) {
+    return `${monthsDiff} month${monthsDiff !== 1 ? "s" : ""}`;
+  }
+
+  if (monthsDiff === 0) {
+    return `${yearsDiff} year${yearsDiff !== 1 ? "s" : ""}`;
+  }
+
+  return `${yearsDiff} year${
+    yearsDiff !== 1 ? "s" : ""
+  } and ${monthsDiff} month${monthsDiff !== 1 ? "s" : ""}`;
 };
 
 function parseDate(dateStr) {
