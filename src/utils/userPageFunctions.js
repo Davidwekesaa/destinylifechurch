@@ -114,28 +114,12 @@ export const formatPickedDate = (date) => {
 };
 
 export const calculateAge = (birthdateStr) => {
-  // const birthdate = parseDate(birthdateStr);
-  // const currentDate = new Date(formatDate());
+  let birthdate = parseDate(birthdateStr);
+  let currentDate = new Date(formatDate());
 
-  // const yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
-  // const birthMonth = birthdate.getMonth();
-  // const currentMonth = currentDate.getMonth();
-
-  // if (
-  //   currentMonth < birthMonth ||
-  //   (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())
-  // ) {
-  //   return yearsDiff - 1; // Adjust age if birthdate hasn't occurred yet this year
-  // }
-
-  // return `${yearsDiff} year(s)`;
-
-  const birthdate = parseDate(birthdateStr);
-  const currentDate = new Date(formatDate());
-
-  const yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
-  const birthMonth = birthdate.getMonth();
-  const currentMonth = currentDate.getMonth();
+  let yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
+  let birthMonth = birthdate.getMonth();
+  let currentMonth = currentDate.getMonth();
 
   let monthsDiff = currentMonth - birthMonth;
 
