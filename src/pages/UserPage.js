@@ -227,7 +227,7 @@ export default function UserPage({ headtext }) {
     });
   };
 
-  console.log(formatDate());
+  console.log(`date ${formatDate()}`);
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
@@ -472,10 +472,11 @@ export default function UserPage({ headtext }) {
                                   sx={{ borderRadius: 10 }}
                                   checked={isPresent(row.attendance)}
                                   onChange={(event) =>
-                                    updateAttendanceIsPresent(
+                                    chooseFunction(
                                       event,
                                       row._id,
-                                      setchangedIsPresent
+                                      setchangedIsPresent,
+                                      isPresent(row.attendance)
                                     )
                                   }
                                 />
@@ -534,7 +535,7 @@ export default function UserPage({ headtext }) {
 
                               <TableCell align="left">
                                 {" "}
-                                {calculateAge(row.DOB)}
+                                {calculateAge(row?.DOB)}
                               </TableCell>
 
                               <TableCell align="left">

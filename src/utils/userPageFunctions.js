@@ -115,7 +115,7 @@ export const formatPickedDate = (date) => {
 
 export const calculateAge = (birthdateStr) => {
   let birthdate = parseDate(birthdateStr);
-  let currentDate = new Date(formatDate());
+  let currentDate = new Date();
 
   let yearsDiff = currentDate.getFullYear() - birthdate.getFullYear();
   let birthMonth = birthdate.getMonth();
