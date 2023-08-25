@@ -26,7 +26,6 @@ export function getPresentToday(filteredUsers) {
 }
 
 export function isMissing(attent) {
-  console.log(attent);
   const isTodayPresent = attent.reduce((accumulator, currentObject) => {
     if (currentObject.date === formatDate() && !currentObject.present) {
       return true;
@@ -38,7 +37,6 @@ export function isMissing(attent) {
 }
 
 export function isPresent(attent) {
-  console.log(attent);
   const isTodayPresent = attent.reduce((accumulator, currentObject) => {
     if (currentObject.date === formatDate() && currentObject.present) {
       return true;
