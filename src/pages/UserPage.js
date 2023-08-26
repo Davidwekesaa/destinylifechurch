@@ -145,6 +145,7 @@ export default function UserPage({ headtext }) {
         .catch((error) => {});
     };
     getAllChildren();
+    console.log(filteredUsers);
   }, [headtext, changedIsPresent]);
 
   //serch
