@@ -158,3 +158,41 @@ export const chooseFunction = (e, id, setchangedIsPresent, isPresent) => {
     updateAttendanceIsPresent(e, id, setchangedIsPresent);
   }
 };
+
+export const sanitiseUser = (data) => {
+  let children = [];
+  data.map((child) => {
+    let Atendance = [];
+    child?.attendance?.map((attend) => {
+      Atendance.push({
+        [attend?.date]: attend?.present,
+      });
+    });
+    let margedAtendance = Atendance?.reduce((result, obj) => {
+      Object.keys(obj).forEach((key) => {
+        result[key] = obj[key];
+      });
+      return result;
+    }, {});
+
+    console.log("attendance", margedAtendance);
+
+    let user = {
+      Child_Name: child?.childName,
+      Gender: child?.childGender,
+      Age: calculateAge(child?.DOB),
+      Group: child?.childCategory,
+      Parents: child?.fatherName + " " + "/" + " " + child?.parentName,
+      Parents_Contact:
+        child?.fatherContact + " " + "/" + " " + child?.parentContact,
+    };
+
+    let margedObject = { ...user, ...margedAtendance };
+
+    children.push(margedObject);
+    console.log("marge", children);
+    Atendance.length = 0;
+  });
+
+  return children;
+};

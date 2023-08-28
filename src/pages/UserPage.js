@@ -51,9 +51,11 @@ import {
   getPresentLastWeek,
   calculateAge,
   chooseFunction,
+  sanitiseUser,
 } from "../utils/userPageFunctions";
 import axios from "axios";
 import Logo from "../components/logo/Logo";
+import { ExportCSV } from "../utils/excell/ExportCSV";
 
 // ----------------------------------------------------------------------
 
@@ -145,7 +147,6 @@ export default function UserPage({ headtext }) {
         .catch((error) => {});
     };
     getAllChildren();
-    console.log(filteredUsers);
   }, [headtext, changedIsPresent]);
 
   //serch
@@ -288,6 +289,7 @@ export default function UserPage({ headtext }) {
       </>
     );
   }
+  console.log(filteredUsers);
   return (
     <>
       <Helmet>
@@ -318,10 +320,19 @@ export default function UserPage({ headtext }) {
           direction="row"
           alignItems="center"
           justifyContent="space-between"
+          flexWrap="wrap"
           mb={0}
         >
           <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
             Active Register for {headtext}
+          </Typography>
+
+          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
+            <ExportCSV
+              csvData={sanitiseUser(filteredUsers)}
+              fileName={`report for ${headtext}`}
+              group={headtext}
+            />
           </Typography>
         </Stack>
 
@@ -632,252 +643,6 @@ export default function UserPage({ headtext }) {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-        {/* missing redister */}
-        {/* <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          mt={10}
-        >
-          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-            Missing Register
-          </Typography>
-        </Stack>
-        <Divider sx={{ borderStyle: "solid", font: 200 }} />
-        <Card sx={{ marginTop: 5 }}>
-          <Scrollbar sx={{ height: heightRow }}>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <UserListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={filteredUsers.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                <TableBody>
-                  {search.trim().length != 0 && searchUsers?.length != 0
-                    ? searchUsers
-                        ?.slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              hover
-                              key={row.id}
-                              tabIndex={-1}
-                              role="checkbox"
-                              // selected={selectedUser}
-                            >
-                              <TableCell padding="checkbox">
-                                <Checkbox
-                                // checked={selectedUser}
-                                // onChange={(event) => handleClick(event, row.id)}
-                                />
-                              </TableCell>
-
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                padding="none"
-                              >
-                                <Stack
-                                  direction="row"
-                                  alignItems="center"
-                                  spacing={2}
-                                >
-                                  <Typography variant="subtitle2" noWrap>
-                                    {row.childName}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-
-                              <TableCell align="left">{row.childAge}</TableCell>
-
-                              <TableCell align="left">
-                                {returnFirstLetter(row.childGender)}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row.parentName}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row.parentContact}
-                              </TableCell>
-
-                              <TableCell
-                                align="left"
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Checkbox
-                                  name="remember"
-                                  label="Remember me"
-                                  checked={isMissing(row.attendance)}
-                                  onChange={(event) =>
-                                    updateAttendanceIsMissing(
-                                      event,
-                                      row._id,
-                                      setchangedIsPresent
-                                    )
-                                  }
-                                />
-                              </TableCell>
-
-                              <TableCell align="left">
-                                <IconButton
-                                  size="large"
-                                  color="inherit"
-                                  onClick={(event) =>
-                                    handleOpenMenuHistory(event, row._id)
-                                  }
-                                >
-                                  <HistoryToggleOffIcon />
-                                </IconButton>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
-                    : filteredUsers
-                        ?.slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              hover
-                              key={row.id}
-                              tabIndex={-1}
-                              role="checkbox"
-                              // selected={selectedUser}
-                            >
-                              <TableCell padding="checkbox">
-                                <Checkbox
-                                // checked={selectedUser}
-                                // onChange={(event) => handleClick(event, row.id)}
-                                />
-                              </TableCell>
-
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                padding="none"
-                              >
-                                <Stack
-                                  direction="row"
-                                  alignItems="center"
-                                  spacing={2}
-                                >
-                                  <Typography variant="subtitle2" noWrap>
-                                    {row.childName}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-
-                              <TableCell align="left">{row.childAge}</TableCell>
-
-                              <TableCell align="left">
-                                {returnFirstLetter(row.childGender)}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row.parentName}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row.parentContact}
-                              </TableCell>
-
-                              <TableCell
-                                align="left"
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Checkbox
-                                  name="remember"
-                                  label="Remember me"
-                                  checked={isMissing(row.attendance)}
-                                  onChange={(event) =>
-                                    updateAttendanceIsMissing(
-                                      event,
-                                      row._id,
-                                      setchangedIsPresent
-                                    )
-                                  }
-                                />
-                              </TableCell>
-
-                              <TableCell align="left">
-                                <IconButton
-                                  size="large"
-                                  color="inherit"
-                                  onClick={(event) =>
-                                    handleOpenMenuHistory(event, row._id)
-                                  }
-                                >
-                                  <HistoryToggleOffIcon />
-                                </IconButton>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: "center",
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
-
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete
-                            words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
-
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredUsers?.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card> */}
       </Container>
       <NotificationsPopover
         open={openHistory}

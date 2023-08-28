@@ -40,6 +40,7 @@ export default function NotificationsPopover({
     const formattedDate = `${day}/${month}`;
     return formattedDate;
   };
+
   return (
     <>
       <Popover
