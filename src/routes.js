@@ -49,6 +49,7 @@ export default function Router() {
           element: <UserPage headtext={"Discoverers"} />,
         },
         { path: "doers", element: <UserPage headtext={"Doers"} /> },
+        { path: "all", element: <UserPage headtext={"All"} /> },
       ],
     },
     {

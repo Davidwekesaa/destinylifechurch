@@ -133,18 +133,27 @@ export default function UserPage({ headtext }) {
   useEffect(() => {
     //get all products
     const getAllChildren = async () => {
-      await axios
-        .get(`${process.env.REACT_APP_Server_Url}children/`)
-        .then((children) => {
-          setFilteredUsers(
-            children?.data?.filter((item) =>
-              item?.childCategory
-                ?.toLowerCase()
-                .includes(headtext?.toLowerCase())
-            )
-          );
-        })
-        .catch((error) => {});
+      if (headtext.toLowerCase() !== "all") {
+        await axios
+          .get(`${process.env.REACT_APP_Server_Url}children/`)
+          .then((children) => {
+            setFilteredUsers(
+              children?.data?.filter((item) =>
+                item?.childCategory
+                  ?.toLowerCase()
+                  .includes(headtext?.toLowerCase())
+              )
+            );
+          })
+          .catch((error) => {});
+      } else {
+        await axios
+          .get(`${process.env.REACT_APP_Server_Url}children/`)
+          .then((children) => {
+            setFilteredUsers(children?.data);
+          })
+          .catch((error) => {});
+      }
     };
     getAllChildren();
   }, [headtext, changedIsPresent]);
