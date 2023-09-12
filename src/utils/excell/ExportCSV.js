@@ -43,7 +43,7 @@ export const ExportCSV = ({ csvData, fileName, group }) => {
   return (
     <Button
       variant="warning"
-      sx={{ fontSize: "20px" }}
+      sx={{ fontSize: "20px", background: "#000099", color: "white" }}
       onClick={(e) => exportToCSV(csvData, fileName)}
     >
       {`Generate Report for ${group}`}

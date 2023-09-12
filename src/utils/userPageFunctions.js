@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as XLSX from "xlsx";
 
 export function formatDate() {
   const date = new Date(); // Replace this with your date object
@@ -72,7 +73,7 @@ export const updateAttendanceIsMissing = async (e, id, setchangedIsPresent) => {
 };
 
 export function returnFirstLetter(name) {
-  const firstLetter = name[0].toUpperCase();
+  const firstLetter = name ? name[0]?.toUpperCase() : null;
   return firstLetter;
 }
 
@@ -165,7 +166,7 @@ export const sanitiseUser = (data) => {
     let Atendance = [];
     child?.attendance?.map((attend) => {
       Atendance.push({
-        [attend?.date]: attend?.present,
+        [getWeekOfMonth(attend?.date)]: attend?.present ? "Present" : "Absent",
       });
     });
     let margedAtendance = Atendance?.reduce((result, obj) => {
@@ -175,24 +176,113 @@ export const sanitiseUser = (data) => {
       return result;
     }, {});
 
-    console.log("attendance", margedAtendance);
-
     let user = {
       Child_Name: child?.childName,
       Gender: child?.childGender,
-      Age: calculateAge(child?.DOB),
+      Age: child?.DOB ? calculateAge(child?.DOB) : "",
       Group: child?.childCategory,
-      Parents: child?.fatherName + " " + "/" + " " + child?.parentName,
+      Parents:
+        child?.fatherName && child?.parentName
+          ? ` ${child?.fatherName} + " " + "/" + " " + ${child?.parentName} `
+          : child?.fatherName && !child?.parentName
+          ? child?.fatherName
+          : child?.parentName,
       Parents_Contact:
-        child?.fatherContact + " " + "/" + " " + child?.parentContact,
+        child?.fatherContact && child?.parentContact
+          ? ` ${child?.fatherContact} + " " + "/" + " " + ${child?.parentContact} `
+          : child?.fatherContact && !child?.parentContact
+          ? child?.fatherContact
+          : child?.parentContact,
     };
 
     let margedObject = { ...user, ...margedAtendance };
 
     children.push(margedObject);
-    console.log("marge", children);
+
     Atendance.length = 0;
   });
 
   return children;
+};
+
+function parseDatee(dateString) {
+  const parts = dateString.split("/");
+  if (parts.length === 3) {
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+    const year = parseInt(parts[2], 10);
+
+    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+      return new Date(year, month, day);
+    }
+  }
+  return null; // Invalid date format
+}
+export function getWeekOfMonth(dat) {
+  let date = parseDatee(dat);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1);
+  const dayOfMonth = date.getDate();
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const dayOfWeek = date.getDay();
+  const weekNumber = Math.ceil((dayOfMonth + dayOfWeek) / 7);
+
+  // return `WK ${weekNumber} [${dayOfMonth}${daySuffix}]`;
+  return `WK ${weekNumber} [${dayOfMonth}]`;
+}
+
+export const handleUpload = (
+  e,
+  Uploading,
+  changedIsPresent,
+  loading,
+  uploadComplete
+) => {
+  e.preventDefault();
+  loading();
+  Uploading(true);
+
+  var files = e.target.files,
+    f = files[0];
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var data = e.target.result;
+    let readedData = XLSX.read(data, { type: "binary" });
+    const wsname = readedData.SheetNames[0];
+    const ws = readedData.Sheets[wsname];
+    /* Convert array to json*/
+    const dataParse = XLSX.utils.sheet_to_json(ws, { header: 0, raw: false });
+
+    handleuploadcsv(
+      dataParse,
+      Uploading,
+      changedIsPresent,
+      loading,
+      uploadComplete
+    );
+  };
+  reader.readAsBinaryString(f);
+};
+
+const handleuploadcsv = (
+  data,
+  Uploading,
+  changedIsPresent,
+  loading,
+  uploadComplete
+) => {
+  const addToDB = async () => {
+    await axios
+      .post(`${process.env.REACT_APP_Server_Url}children/xlsx/`, { data })
+      .then((logins) => {
+        Uploading(false);
+        uploadComplete();
+        let x = Math.random() * 100;
+        changedIsPresent(x);
+      })
+      .catch((error) => {});
+  };
+  addToDB();
 };

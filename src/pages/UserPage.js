@@ -52,10 +52,14 @@ import {
   calculateAge,
   chooseFunction,
   sanitiseUser,
+  handleUpload,
 } from "../utils/userPageFunctions";
 import axios from "axios";
 import Logo from "../components/logo/Logo";
 import { ExportCSV } from "../utils/excell/ExportCSV";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // ----------------------------------------------------------------------
 
@@ -129,6 +133,11 @@ export default function UserPage({ headtext }) {
 
   const [search, setSearch] = useState("");
   const [searchUsers, setSearchUsers] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const uploading = () =>
+    toast.success("The file is being uploaded please wait...");
+  const uploadComplete = () => toast.success("File  uploaded successfuly");
 
   useEffect(() => {
     //get all products
@@ -169,13 +178,12 @@ export default function UserPage({ headtext }) {
   const handleOpenMenuHistory = async (event, id) => {
     event.preventDefault();
     setCheckHistory(id);
-    console.log(checkHistory);
+
     if (checkHistory.trim().length === 0) {
     } else {
       await axios
         .get(`${process.env.REACT_APP_Server_Url}history/${id}`)
         .then((children) => {
-          console.log(children.data);
           sethistoryData(children.data);
           setOpenHistory(true);
         })
@@ -212,7 +220,7 @@ export default function UserPage({ headtext }) {
 
   const handleClick = (event, id) => {
     event.preventDefault();
-    console.log(id);
+
     setSelected(id);
   };
 
@@ -238,7 +246,6 @@ export default function UserPage({ headtext }) {
     });
   };
 
-  console.log(`date ${formatDate()}`);
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
@@ -289,16 +296,38 @@ export default function UserPage({ headtext }) {
             <AddIcon />
             Add New Child
           </Button>
+          <Button
+            onClick={() => document.getElementById("fileInput").click()}
+            className="fileInputTex"
+            disabled={isUploading}
+          >
+            {isUploading ? "Uploading..." : "Upload File"}
+          </Button>
         </Box>
         <AddNewPupil
           open={Boolean(openAddNewPupil)}
           handleCloseMenu={handleCloseMenuAddNewPupil}
           headTextdata={headtext}
         />
+        <input
+          type="file"
+          id="fileInput"
+          className="fileInputText"
+          onChange={(e) =>
+            handleUpload(
+              e,
+              setIsUploading,
+              setchangedIsPresent,
+              uploading,
+              uploadComplete
+            )
+          }
+        />
+        <ToastContainer />
       </>
     );
   }
-  console.log(filteredUsers);
+
   return (
     <>
       <Helmet>
@@ -333,7 +362,17 @@ export default function UserPage({ headtext }) {
           mb={0}
         >
           <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-            Active Register for {headtext}
+            <Button>Active Register for {headtext}</Button>
+          </Typography>
+
+          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
+            <Button
+              onClick={() => document.getElementById("fileInput").click()}
+              className="fileInputTex"
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Upload File"}
+            </Button>
           </Typography>
 
           <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
@@ -466,7 +505,7 @@ export default function UserPage({ headtext }) {
                               </TableCell>
 
                               <TableCell align="left">
-                                {calculateAge(row.DOB)}
+                                {row.DOB ? calculateAge(row.DOB) : ""}
                               </TableCell>
 
                               <TableCell align="left">
@@ -556,7 +595,7 @@ export default function UserPage({ headtext }) {
 
                               <TableCell align="left">
                                 {" "}
-                                {calculateAge(row?.DOB)}
+                                {row?.DOB ? calculateAge(row?.DOB) : null}
                               </TableCell>
 
                               <TableCell align="left">
@@ -564,11 +603,19 @@ export default function UserPage({ headtext }) {
                               </TableCell>
 
                               <TableCell align="left">
-                                {` ${row?.fatherName} / ${row?.parentName} `}
+                                {row?.fatherName && row?.parentName
+                                  ? ` ${row?.fatherName} / ${row?.parentName} `
+                                  : row?.fatherName && !row?.parentName
+                                  ? row?.fatherName
+                                  : row?.parentName}
                               </TableCell>
 
                               <TableCell align="left">
-                                {`${row.fatherContact} / ${row.parentContact}`}
+                                {row?.fatherContact && row?.parentContact
+                                  ? ` ${row?.fatherContact} / ${row?.parentContact} `
+                                  : row?.fatherContact && !row?.parentContact
+                                  ? row?.fatherContact
+                                  : row?.parentContact}
                               </TableCell>
 
                               <TableCell
@@ -663,6 +710,21 @@ export default function UserPage({ headtext }) {
         handleCloseMenu={handleCloseMenuAddNewPupil}
         headTextdata={headtext}
       />
+      <input
+        type="file"
+        id="fileInput"
+        className="fileInputText"
+        onChange={(e) =>
+          handleUpload(
+            e,
+            setIsUploading,
+            setchangedIsPresent,
+            uploading,
+            uploadComplete
+          )
+        }
+      />
+      <ToastContainer />
     </>
   );
 }
