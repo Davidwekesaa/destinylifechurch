@@ -1,9 +1,9 @@
 export const initialState = {
-  nav: localStorage.getItem("nav") ? localStorage.getItem("nav") : false,
+  nav: sessionStorage.getItem("nav") ? sessionStorage.getItem("nav") : false,
 
   user:
-    localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"))
-      ? JSON.parse(localStorage.getItem("user"))
+    sessionStorage.getItem("user") && JSON.parse(sessionStorage.getItem("user"))
+      ? JSON.parse(sessionStorage.getItem("user"))
       : null,
 };
 

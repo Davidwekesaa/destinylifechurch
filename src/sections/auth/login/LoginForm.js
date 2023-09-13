@@ -48,7 +48,7 @@ export default function LoginForm() {
           password: password,
         })
         .then((logins) => {
-          localStorage.setItem("user", JSON.stringify(logins.data));
+          sessionStorage.setItem("user", JSON.stringify(logins.data));
           dispatch({
             type: actionType.SET_USER,
             user: logins.data,
@@ -105,14 +105,14 @@ export default function LoginForm() {
         sx={{ my: 2 }}
       >
         {/* <Checkbox name="remember" label="Remember me" /> */}
-        <Link
+        {/* <Link
           variant="subtitle2"
           underline="hover"
           onClick={(e) => navigate("/register", { replace: true })}
           sx={{ cursor: "pointer" }}
         >
           Create Account?
-        </Link>
+        </Link> */}
         <Link variant="subtitle2" underline="hover" sx={{ cursor: "pointer" }}>
           Forgot password?
         </Link>

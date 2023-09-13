@@ -8,6 +8,7 @@ import {
   Divider,
   Stack,
   Button,
+  Popover,
 } from "@mui/material";
 // hooks
 import useResponsive from "../hooks/useResponsive";
@@ -16,6 +17,7 @@ import Logo from "../components/logo";
 import Iconify from "../components/iconify";
 // sections
 import { Register } from "../sections/auth/register";
+import { ToastContainer, toast } from "react-toastify";
 
 // ----------------------------------------------------------------------
 
@@ -47,50 +49,66 @@ const StyledContent = styled("div")(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function RegisterPage() {
+export default function RegisterPage({ open, handleCloseMenu }) {
   const mdUp = useResponsive("up", "md");
 
   return (
     <>
-      <Helmet>
-        <title> Destiny Life Church | Register </title>
-      </Helmet>
+      <Popover
+        open={open}
+        anchorEl={open}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: "center", horizontal: "center" }}
+        transformOrigin={{ vertical: "center", horizontal: "center" }}
+        PaperProps={{
+          sx: {
+            mt: 1.5,
+            ml: 0.75,
+            width: 570,
+          },
+        }}
+      >
+        <Helmet>
+          <title> Destiny Life Church | Register </title>
+        </Helmet>
 
-      <StyledRoot>
-        <Logo
-          sx={{
-            position: "fixed",
-            top: { xs: 16, sm: 24, md: 40 },
-            left: { xs: 16, sm: 24, md: 40 },
-          }}
-        />
+        <StyledRoot>
+          {/* <Logo
+            sx={{
+              position: "fixed",
+              top: { xs: 16, sm: 24, md: 40 },
+              left: { xs: 16, sm: 24, md: 40 },
+            }}
+          /> */}
 
-        {mdUp && (
-          <StyledSection>
-            <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-              Hi, Welcome Back
-            </Typography>
-            <img
-              src="/assets/illustrations/illustration_login.png"
-              alt="login"
-            />
-          </StyledSection>
-        )}
+          {mdUp && (
+            <StyledSection>
+              <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
+                Hi, Welcome Back
+              </Typography>
+              <img
+                src="/assets/illustrations/illustration_login.png"
+                alt="login"
+              />
+            </StyledSection>
+          )}
 
-        <Container maxWidth="sm">
-          <StyledContent>
-            <Typography
-              variant="h4"
-              gutterBottom
-              sx={{ marginBottom: 5, color: "#000099" }}
-            >
-              CLERK ON DUTY REGISTER
-            </Typography>
+          <Container maxWidth="sm">
+            <StyledContent>
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{ marginBottom: 5, color: "#000099" }}
+              >
+                CLERK ON DUTY REGISTER
+              </Typography>
 
-            <Register />
-          </StyledContent>
-        </Container>
-      </StyledRoot>
+              <Register handleCloseMenu={handleCloseMenu} />
+            </StyledContent>
+          </Container>
+        </StyledRoot>
+      </Popover>
+      <ToastContainer />
     </>
   );
 }

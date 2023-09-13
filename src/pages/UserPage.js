@@ -62,20 +62,9 @@ import { ExportCSV } from "../utils/excell/ExportCSV";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UpdatePupil from "src/layouts/dashboard/header/UpdatePupil";
+import RegisterPage from "./RegisterPage";
 
 // ----------------------------------------------------------------------
-
-const TABLE_HEAD = [
-  { id: "name", label: "Name", alignRight: false },
-  { id: "age", label: "Age", alignRight: false },
-  { id: "gender", label: "Gender", alignRight: false },
-  { id: "parentGurdian", label: "Parent/Gurdian", alignRight: false },
-  { id: "parentContact", label: "Parent Contacts", alignRight: false },
-  { id: "present", label: `Present on ${formatDate()}`, alignRight: false },
-  { id: "history", label: "History", alignRight: false },
-  { id: "action", label: "Action", alignRight: false },
-  // { id: '' },
-];
 
 // ----------------------------------------------------------------------
 
@@ -112,7 +101,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function UserPage({ headtext }) {
-  const [{ nav }, dispatch] = useStateValue();
+  const [{ nav, user }, dispatch] = useStateValue();
   const [openHistory, setOpenHistory] = useState(null);
   const [openAddNewPupil, setOpenAddNewPupil] = useState(null);
 
@@ -140,10 +129,26 @@ export default function UserPage({ headtext }) {
   const [child, setChild] = useState("");
   const [openchildpopup, setOpenchildpopup] = useState(null);
 
+  const [openRegister, setOpenRegister] = useState(false);
+
   const uploading = () =>
     toast.success("The file is being uploaded please wait...");
   const uploadComplete = () => toast.success("File  uploaded successfully");
   const deleteComplete = () => toast.success("Deleted successfully");
+
+  const TABLE_HEAD = [
+    { id: "name", label: "Name", alignRight: false },
+    { id: "age", label: "Age", alignRight: false },
+    { id: "gender", label: "Gender", alignRight: false },
+    { id: "parentGurdian", label: "Parent/Gurdian", alignRight: false },
+    { id: "parentContact", label: "Parent Contacts", alignRight: false },
+    { id: "present", label: `Present on ${formatDate()}`, alignRight: false },
+    { id: "history", label: "History", alignRight: false },
+    user.userRights === 1
+      ? { id: "action", label: "Action", alignRight: false }
+      : "",
+    // { id: '' },
+  ];
 
   useEffect(() => {
     //get all products
@@ -229,6 +234,12 @@ export default function UserPage({ headtext }) {
   const handleOpenMenuAddNewPupil = (event) => {
     setOpenAddNewPupil(event.currentTarget);
   };
+  const handleCloseRegister = () => {
+    setOpenRegister(null);
+  };
+  const handleOpenRegister = () => {
+    setOpenRegister(true);
+  };
 
   const handleCloseMenuAddNewPupil = () => {
     setOpenAddNewPupil(null);
@@ -270,7 +281,7 @@ export default function UserPage({ headtext }) {
   };
 
   const openNav = () => {
-    localStorage.setItem("nav", !nav);
+    sessionStorage.setItem("nav", !nav);
     dispatch({
       type: actionType.SET_NAV,
       nav: !nav,
@@ -396,23 +407,46 @@ export default function UserPage({ headtext }) {
             <Button>Active Register for {headtext}</Button>
           </Typography>
 
-          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-            <Button
-              onClick={() => document.getElementById("fileInput").click()}
-              className="fileInputTex"
-              disabled={isUploading}
-            >
-              {isUploading ? "Uploading..." : "Upload File"}
-            </Button>
-          </Typography>
+          {user.userRights === 1 ? (
+            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
+              <Button
+                onClick={() => document.getElementById("fileInput").click()}
+                className="fileInputTex"
+                disabled={isUploading}
+                variant="warning"
+                sx={{ fontSize: "20px", background: "#000099", color: "white" }}
+              >
+                {isUploading ? "Uploading..." : "Upload File"}
+              </Button>
+            </Typography>
+          ) : (
+            ""
+          )}
 
-          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-            <ExportCSV
-              csvData={sanitiseUser(filteredUsers)}
-              fileName={`report for ${headtext}`}
-              group={headtext}
-            />
-          </Typography>
+          {user.userRights === 1 ? (
+            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
+              <ExportCSV
+                csvData={sanitiseUser(filteredUsers)}
+                fileName={`report for ${headtext}`}
+                group={headtext}
+              />
+            </Typography>
+          ) : (
+            ""
+          )}
+          {user.userRights === 1 ? (
+            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
+              <Button
+                variant="warning"
+                sx={{ fontSize: "20px", background: "#000099", color: "white" }}
+                onClick={handleOpenRegister}
+              >
+                Add User
+              </Button>
+            </Typography>
+          ) : (
+            ""
+          )}
         </Stack>
 
         <Stack
@@ -684,34 +718,38 @@ export default function UserPage({ headtext }) {
                                   />
                                 </IconButton>
                               </TableCell>
-                              <TableCell align="left">
-                                <IconButton size="small" color="inherit">
-                                  <span
-                                    className={`dash-status edit`}
-                                    // onClick={(`${row.status}`)}
-                                    onClick={(e) =>
-                                      handleClickOpenEditPopUp(e, row._id)
-                                    }
-                                  >
-                                    Edit
-                                  </span>
-                                  {"   "}
-                                  <span
-                                    className={`dash-status declined`}
-                                    // onClick={(`${row.status}`)}
-                                    onClick={(e) =>
-                                      hundleRowDelete(
-                                        e,
-                                        row._id,
-                                        setchangedIsPresent,
-                                        deleteComplete
-                                      )
-                                    }
-                                  >
-                                    Delete
-                                  </span>
-                                </IconButton>
-                              </TableCell>
+                              {user.userRights === 1 ? (
+                                <TableCell align="left">
+                                  <IconButton size="small" color="inherit">
+                                    <span
+                                      className={`dash-status edit`}
+                                      // onClick={(`${row.status}`)}
+                                      onClick={(e) =>
+                                        handleClickOpenEditPopUp(e, row._id)
+                                      }
+                                    >
+                                      Edit
+                                    </span>
+                                    {"   "}
+                                    <span
+                                      className={`dash-status declined`}
+                                      // onClick={(`${row.status}`)}
+                                      onClick={(e) =>
+                                        hundleRowDelete(
+                                          e,
+                                          row._id,
+                                          setchangedIsPresent,
+                                          deleteComplete
+                                        )
+                                      }
+                                    >
+                                      Delete
+                                    </span>
+                                  </IconButton>
+                                </TableCell>
+                              ) : (
+                                ""
+                              )}
                             </TableRow>
                           );
                         })}
@@ -776,6 +814,11 @@ export default function UserPage({ headtext }) {
         handleCloseMenu={handleCloseEditNewPupil}
         childData={child}
         cganges={setchangedIsPresent}
+      />
+
+      <RegisterPage
+        open={Boolean(openRegister)}
+        handleCloseMenu={handleCloseRegister}
       />
       <input
         type="file"

@@ -60,12 +60,12 @@ export default function Nav() {
 
   const hundleLogout = (e) => {
     e.preventDefault();
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     window.location.reload();
   };
 
   const onCloseNav = () => {
-    localStorage.setItem("nav", !nav);
+    sessionStorage.setItem("nav", !nav);
     dispatch({
       type: actionType.SET_NAV,
       nav: !nav,

@@ -8,6 +8,7 @@ import {
   InputAdornment,
   TextField,
   Checkbox,
+  Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
@@ -20,16 +21,18 @@ import axios from "axios";
 import Logging from "../../../layouts/dashboard/header/Logging";
 // ----------------------------------------------------------------------
 
-export default function Register() {
+export default function Register({ handleCloseMenu }) {
   const [{}, dispatch] = useStateValue();
   const [userName, setuserName] = useState("");
   const [userEmail, setuserEmail] = useState("");
   const [userPassword, setuserPassword] = useState("");
   const [openLoading, setOpenLoading] = useState(null);
+  const [superUser, setSuperUser] = useState(false);
   const navigate = useNavigate();
 
   const emptyFields = () => toast.error("All the fields are required");
   const wronUser = () => toast.error("An Error Occured");
+  const userAdde = () => toast.success("User Added Successfully");
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,15 +55,12 @@ export default function Register() {
           userEmail: userEmail,
           password: userPassword,
           userName: userName,
+          userRights: superUser,
         })
         .then((logins) => {
-          localStorage.setItem("user", JSON.stringify(logins.data));
-          dispatch({
-            type: actionType.SET_USER,
-            user: logins.data,
-          });
+          userAdde();
           setOpenLoading(null);
-          navigate("/dashboard", { replace: true });
+          handleCloseMenu();
         })
         .catch((error) => {
           setOpenLoading(null);
@@ -112,12 +112,18 @@ export default function Register() {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
+        flexDirection={"row-reverse"}
         sx={{ my: 2 }}
       >
-        <Checkbox name="remember" label="Remember me" />
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
+        <Checkbox
+          name="remember"
+          label="Remember me"
+          value={superUser}
+          onChange={(e) => setSuperUser(!superUser)}
+        />
+        <Typography variant="subtitle2" underline="hover">
+          Super User?
+        </Typography>
       </Stack>
 
       <LoadingButton
