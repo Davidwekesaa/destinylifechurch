@@ -35,12 +35,15 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-import { formatPickedDate } from "../../../utils/userPageFunctions";
+import {
+  formatPickedDate,
+  reverseformatDate,
+} from "../../../utils/userPageFunctions";
 import Logging from "./Logging";
 
 // ----------------------------------------------------------------------
 
-function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
+function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
   const [fName, setFname] = useState("");
   const [fContact, setFContact] = useState("");
 
@@ -61,9 +64,27 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   const errorr = () => toast.error("There was error");
   const su = () => toast.success("Record added successful");
 
-  // useEffect(() => {
-  //   setcCategory(headTextdata);
-  // }, [headTextdata]);
+  useEffect(() => {
+    const ftch = async () => {
+      await axios
+        .get(`${process.env.REACT_APP_Server_Url}children/${childData}`)
+        .then((data) => {
+          setFname(data?.data?.fatherName);
+          setFContact(data?.data?.fatherContact);
+          setPname(data?.data?.parentName);
+          setpContact(data?.data?.parentContact);
+          setRelationShip(data?.data?.Relationship);
+          setCname(data?.data?.childName);
+          setcGender(data?.data?.childGender);
+          setAge(data?.data?.DOB);
+        })
+        .catch((error) => {});
+    };
+
+    ftch();
+
+    // console.log("udate child", childData?.childCategory);
+  }, [childData]);
 
   const setEmptyFields = () => {
     setPname("");
@@ -77,43 +98,44 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   };
 
   const addNewPupill = async () => {
-    if (
-      pName.trim().length === 0 ||
-      pContact.trim().length === 0 ||
-      relationShip.trim().length === 0 ||
-      cName.trim().length === 0 ||
-      cGender.trim().length === 0 ||
-      age?.length === 0 ||
-      fName.trim().length === 0 ||
-      fContact.trim().length === 0
-    ) {
-      emptyFields();
-    } else {
-      setOpenLoading(true);
-      console.log("age", age);
-      await axios
-        .post(`${process.env.REACT_APP_Server_Url}children/`, {
-          parentName: pName,
-          parentContact: pContact,
-          fatherName: fName,
-          fatherContact: fContact,
-          Relationship: relationShip,
-          childName: cName,
-          childGender: cGender,
-          DOB: formatPickedDate(age),
-          visitor: visitor,
-        })
-        .then((logins) => {
-          su();
-          setEmptyFields();
-          setOpenLoading(null);
-          handleCloseMenu();
-        })
-        .catch((error) => {
-          setOpenLoading(null);
-          errorr();
-        });
-    }
+    // if (
+    //   pName.trim().length === 0 ||
+    //   pContact.trim().length === 0 ||
+    //   relationShip.trim().length === 0 ||
+    //   cName.trim().length === 0 ||
+    //   cGender.trim().length === 0 ||
+    //   age?.length === 0 ||
+    //   fName.trim().length === 0 ||
+    //   fContact.trim().length === 0
+    // ) {
+    //   emptyFields();
+    // } else {
+    setOpenLoading(true);
+    await axios
+      .put(`${process.env.REACT_APP_Server_Url}children/child/${childData}`, {
+        parentName: pName,
+        parentContact: pContact,
+        fatherName: fName,
+        fatherContact: fContact,
+        Relationship: relationShip,
+        childName: cName,
+        childGender: cGender,
+        DOB: age,
+        visitor: visitor,
+      })
+      .then((logins) => {
+        su();
+        setEmptyFields();
+        setOpenLoading(null);
+        cganges(Math.random() * 1000);
+        handleCloseMenu();
+      })
+      .catch((error) => {
+        setOpenLoading(null);
+        errorr();
+        console.log("update error", error);
+      });
+    // }
   };
 
   const handleCloseLoging = () => {
@@ -155,7 +177,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
             </IconButton>
 
             <Typography variant="h3" sx={{ marginBottom: 2, color: "#000099" }}>
-              Add New Child
+              Update Child Record
             </Typography>
           </Box>
         </Box>
@@ -248,7 +270,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
               value={cName}
             />
 
-            <FormControl
+            {/* <FormControl
               sx={{
                 width: "217px",
                 height: 50,
@@ -274,8 +296,16 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
               </Select>
-            </FormControl>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            </FormControl> */}
+            <TextField
+              name="DOB"
+              label="DOB"
+              sx={{ marginBottom: 2 }}
+              required
+              onChange={(e) => setcGender(e.target.value)}
+              value={cGender}
+            />
+            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker", "DatePicker"]}>
                 <DatePicker
                   label="Date of Birth"
@@ -284,18 +314,15 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                   onChange={(newDate) => setAge(newDate)}
                 />
               </DemoContainer>
-            </LocalizationProvider>
-            {/* <TextField
-              name="cCategory"
-              label="Category"
-              placeholder="eg dazzlers"
+            </LocalizationProvider> */}
+            <TextField
+              name="DOB"
+              label="DOB"
               sx={{ marginBottom: 2 }}
-              // required
-              // onChange={(e) => setcCategory(headText)}
-              value={cCategory}
-              disabled={true}
-            /> */}
-
+              required
+              onChange={(e) => setAge(e.target.value)}
+              value={age}
+            />
             <Box
               sx={{
                 display: "flex",
@@ -318,6 +345,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                 name="remember"
                 label="Remember me"
                 value={visitor}
+                disabled
                 onChange={(e) => setVisitor(!visitor)}
               />
             </Box>
@@ -330,7 +358,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
 
         <Box sx={{ p: 1 }}>
           <Button fullWidth disableRipple onClick={addNewPupill}>
-            Save
+            Update
           </Button>
         </Box>
       </Popover>
@@ -344,4 +372,4 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   );
 }
 
-export default AddNewPupil;
+export default UpdatePupil;

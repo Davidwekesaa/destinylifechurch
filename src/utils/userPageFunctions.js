@@ -286,3 +286,33 @@ const handleuploadcsv = (
   };
   addToDB();
 };
+
+export const hundleRowDelete = async (
+  e,
+  id,
+  setchangedIsPresent,
+  deleteComplete
+) => {
+  e.preventDefault();
+  await axios
+    .delete(`${process.env.REACT_APP_Server_Url}children/${id}`)
+    .then((children) => {
+      deleteComplete();
+      setchangedIsPresent(Math.random() * 1000);
+    })
+    .catch((error) => {});
+};
+
+export function reverseformatDate(inputDate) {
+  // Split the input date into day, month, and year
+  const parts = inputDate.split("/");
+  const day = parts[0];
+  const month = parts[1];
+  const year = parts[2];
+
+  // Create a new Date object with the provided year, month, and day
+  const formattedDate = new Date(`${year}-${month}-${day}T21:00:00.000Z`);
+
+  // Return the formatted date as a string
+  return formattedDate.toISOString();
+}

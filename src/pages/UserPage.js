@@ -53,6 +53,7 @@ import {
   chooseFunction,
   sanitiseUser,
   handleUpload,
+  hundleRowDelete,
 } from "../utils/userPageFunctions";
 import axios from "axios";
 import Logo from "../components/logo/Logo";
@@ -60,6 +61,7 @@ import { ExportCSV } from "../utils/excell/ExportCSV";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UpdatePupil from "src/layouts/dashboard/header/UpdatePupil";
 
 // ----------------------------------------------------------------------
 
@@ -71,6 +73,7 @@ const TABLE_HEAD = [
   { id: "parentContact", label: "Parent Contacts", alignRight: false },
   { id: "present", label: `Present on ${formatDate()}`, alignRight: false },
   { id: "history", label: "History", alignRight: false },
+  { id: "action", label: "Action", alignRight: false },
   // { id: '' },
 ];
 
@@ -122,7 +125,6 @@ export default function UserPage({ headtext }) {
   const [orderBy, setOrderBy] = useState("name");
 
   const [filterName, setFilterName] = useState("");
-  const [checkHistory, setCheckHistory] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [historyData, sethistoryData] = useState([]);
 
@@ -135,9 +137,13 @@ export default function UserPage({ headtext }) {
   const [searchUsers, setSearchUsers] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
+  const [child, setChild] = useState("");
+  const [openchildpopup, setOpenchildpopup] = useState(null);
+
   const uploading = () =>
     toast.success("The file is being uploaded please wait...");
-  const uploadComplete = () => toast.success("File  uploaded successfuly");
+  const uploadComplete = () => toast.success("File  uploaded successfully");
+  const deleteComplete = () => toast.success("Deleted successfully");
 
   useEffect(() => {
     //get all products
@@ -170,16 +176,23 @@ export default function UserPage({ headtext }) {
   //serch
   useEffect(() => {
     setSearchUsers(
-      filteredUsers.filter((child) =>
-        child.childName.toLowerCase().includes(search.toLowerCase())
+      filteredUsers.filter(
+        (child) =>
+          child?.childName?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.parentName?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.childGender?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.DOB?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.childCategory?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.parentContact?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.fatherContact?.toLowerCase().includes(search.toLowerCase())
       )
     );
   }, [search, changedIsPresent]);
   const handleOpenMenuHistory = async (event, id) => {
     event.preventDefault();
-    setCheckHistory(id);
+    // setCheckHistory(id);
 
-    if (checkHistory.trim().length === 0) {
+    if (id?.trim().length === 0) {
     } else {
       await axios
         .get(`${process.env.REACT_APP_Server_Url}history/${id}`)
@@ -191,10 +204,28 @@ export default function UserPage({ headtext }) {
     }
   };
 
+  const handleClickOpenEditPopUp = async (event, id) => {
+    event.preventDefault();
+    if (id?.trim().length === 0) {
+    } else {
+      // await axios
+      //   .get(`${process.env.REACT_APP_Server_Url}children/${id}`)
+      //   .then((children) => {
+      //     setChild(children?.data);
+      //     console.log("update chld", children?.data.fatherName);
+      //     setOpenchildpopup(true);
+      //   })
+      //   .catch((error) => {});
+      setChild(id);
+      setOpenchildpopup(true);
+    }
+  };
   const handleCloseMenuHistory = () => {
     setOpenHistory(null);
   };
-
+  const handleCloseEditNewPupil = () => {
+    setOpenchildpopup(null);
+  };
   const handleOpenMenuAddNewPupil = (event) => {
     setOpenAddNewPupil(event.currentTarget);
   };
@@ -405,7 +436,7 @@ export default function UserPage({ headtext }) {
 
             <TextField
               name="search"
-              placeholder="Search by child name.."
+              placeholder="Search by | child name | parents name | date of birth | gender | parents contacts |"
               // label="User Name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -475,7 +506,7 @@ export default function UserPage({ headtext }) {
                         .map((row) => {
                           return (
                             <TableRow
-                              hover
+                              // hover
                               key={row._id}
                               tabIndex={-1}
                               role="checkbox"
@@ -642,13 +673,43 @@ export default function UserPage({ headtext }) {
 
                               <TableCell align="left">
                                 <IconButton
-                                  size="large"
+                                  size="small"
                                   color="inherit"
                                   onClick={(event) =>
                                     handleOpenMenuHistory(event, row._id)
                                   }
                                 >
-                                  <HistoryToggleOffIcon />
+                                  <HistoryToggleOffIcon
+                                    sx={{ fontSize: "30px" }}
+                                  />
+                                </IconButton>
+                              </TableCell>
+                              <TableCell align="left">
+                                <IconButton size="small" color="inherit">
+                                  <span
+                                    className={`dash-status edit`}
+                                    // onClick={(`${row.status}`)}
+                                    onClick={(e) =>
+                                      handleClickOpenEditPopUp(e, row._id)
+                                    }
+                                  >
+                                    Edit
+                                  </span>
+                                  {"   "}
+                                  <span
+                                    className={`dash-status declined`}
+                                    // onClick={(`${row.status}`)}
+                                    onClick={(e) =>
+                                      hundleRowDelete(
+                                        e,
+                                        row._id,
+                                        setchangedIsPresent,
+                                        deleteComplete
+                                      )
+                                    }
+                                  >
+                                    Delete
+                                  </span>
                                 </IconButton>
                               </TableCell>
                             </TableRow>
@@ -709,6 +770,12 @@ export default function UserPage({ headtext }) {
         open={Boolean(openAddNewPupil)}
         handleCloseMenu={handleCloseMenuAddNewPupil}
         headTextdata={headtext}
+      />
+      <UpdatePupil
+        open={Boolean(openchildpopup)}
+        handleCloseMenu={handleCloseEditNewPupil}
+        childData={child}
+        cganges={setchangedIsPresent}
       />
       <input
         type="file"

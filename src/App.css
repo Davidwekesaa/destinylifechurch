@@ -1,3 +1,23 @@
 .fileInputText {
   visibility: hidden;
 }
+
+.dailog-dash-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash-status.edit {
+  border-radius: 4px;
+  padding: 5px;
+  background-color: rgb(87, 32, 132);
+  color: white;
+}
+
+.dash-status.declined {
+  border-radius: 4px;
+  padding: 5px;
+  background-color: rgb(116, 13, 13);
+  color: white;
+  margin-left: 12px;
+}
