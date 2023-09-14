@@ -546,12 +546,12 @@ export default function UserPage({ headtext }) {
                               role="checkbox"
                               // selected={selectedUser}
                             >
-                              <TableCell padding="checkbox">
+                              {/* <TableCell padding="checkbox">
                                 <Checkbox
                                 // checked={selectedUser}
                                 // onChange={(event) => handleClick(event, row.id)}
                                 />
-                              </TableCell>
+                              </TableCell> */}
 
                               <TableCell
                                 component="th"
@@ -570,7 +570,8 @@ export default function UserPage({ headtext }) {
                               </TableCell>
 
                               <TableCell align="left">
-                                {row.DOB ? calculateAge(row.DOB) : ""}
+                                {" "}
+                                {row?.DOB ? calculateAge(row?.DOB) : null}
                               </TableCell>
 
                               <TableCell align="left">
@@ -578,11 +579,19 @@ export default function UserPage({ headtext }) {
                               </TableCell>
 
                               <TableCell align="left">
-                                {` ${row?.fatherName} / ${row?.parentName} `}
+                                {row?.fatherName && row?.parentName
+                                  ? ` ${row?.fatherName} / ${row?.parentName} `
+                                  : row?.fatherName && !row?.parentName
+                                  ? row?.fatherName
+                                  : row?.parentName}
                               </TableCell>
 
                               <TableCell align="left">
-                                {`${row.fatherContact} / ${row.parentContact}`}
+                                {row?.fatherContact && row?.parentContact
+                                  ? ` ${row?.fatherContact} / ${row?.parentContact} `
+                                  : row?.fatherContact && !row?.parentContact
+                                  ? row?.fatherContact
+                                  : row?.parentContact}
                               </TableCell>
 
                               <TableCell
@@ -609,15 +618,49 @@ export default function UserPage({ headtext }) {
 
                               <TableCell align="left">
                                 <IconButton
-                                  size="large"
+                                  size="small"
                                   color="inherit"
                                   onClick={(event) =>
                                     handleOpenMenuHistory(event, row._id)
                                   }
                                 >
-                                  <HistoryToggleOffIcon />
+                                  <HistoryToggleOffIcon
+                                    sx={{ fontSize: "30px" }}
+                                  />
                                 </IconButton>
                               </TableCell>
+                              {user.userRights === 1 ? (
+                                <TableCell align="left">
+                                  <IconButton size="small" color="inherit">
+                                    <span
+                                      className={`dash-status edit`}
+                                      // onClick={(`${row.status}`)}
+                                      onClick={(e) =>
+                                        handleClickOpenEditPopUp(e, row._id)
+                                      }
+                                    >
+                                      Edit
+                                    </span>
+                                    {"   "}
+                                    <span
+                                      className={`dash-status declined`}
+                                      // onClick={(`${row.status}`)}
+                                      onClick={(e) =>
+                                        hundleRowDelete(
+                                          e,
+                                          row._id,
+                                          setchangedIsPresent,
+                                          deleteComplete
+                                        )
+                                      }
+                                    >
+                                      Delete
+                                    </span>
+                                  </IconButton>
+                                </TableCell>
+                              ) : (
+                                ""
+                              )}
                             </TableRow>
                           );
                         })
@@ -635,12 +678,12 @@ export default function UserPage({ headtext }) {
                               role="checkbox"
                               // selected={selectedUser}
                             >
-                              <TableCell padding="checkbox">
+                              {/* <TableCell padding="checkbox">
                                 <Checkbox
                                 // checked={selectedUser}
                                 // onChange={(event) => handleClick(event, row.id)}
                                 />
-                              </TableCell>
+                              </TableCell> */}
 
                               <TableCell
                                 component="th"
