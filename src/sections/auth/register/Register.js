@@ -55,7 +55,7 @@ export default function Register({ handleCloseMenu }) {
           userEmail: userEmail,
           password: userPassword,
           userName: userName,
-          userRights: superUser,
+          userRights: superUser ? "superuser" : "clerk",
         })
         .then((logins) => {
           userAdde();

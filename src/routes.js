@@ -7,7 +7,7 @@ import SimpleLayout from "./layouts/simple";
 //
 import UserPage from "./pages/UserPage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import ParenstRegister from "./pages/ParenstRegister";
 import Page404 from "./pages/Page404";
 import { useStateValue } from "./store/StateProvider";
 
@@ -31,7 +31,7 @@ export default function Router() {
       path: "/dashboard",
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/dazzlers" />, index: true },
+        { element: <Navigate to="/dashboard/all" />, index: true },
         {
           path: "dazzlers",
           element: <UserPage headtext={"Dazzlers"} />,
@@ -58,7 +58,7 @@ export default function Router() {
     },
     {
       path: "register",
-      element: <RegisterPage />,
+      element: <ParenstRegister />,
     },
     {
       element: <SimpleLayout />,

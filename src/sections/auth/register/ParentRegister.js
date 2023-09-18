@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // @mui
 import {
@@ -10,27 +8,33 @@ import {
   InputAdornment,
   TextField,
   Checkbox,
+  Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
 import Iconify from "../../../components/iconify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { actionType } from "../../../store/reducer";
 import { useStateValue } from "../../../store/StateProvider";
 import axios from "axios";
 import Logging from "../../../layouts/dashboard/header/Logging";
-
 // ----------------------------------------------------------------------
 
-export default function LoginForm() {
-  const navigate = useNavigate();
+export default function ParentRegister() {
   const [{}, dispatch] = useStateValue();
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [userName, setuserName] = useState("");
+  const [userEmail, setuserEmail] = useState("");
+  const [userPassword, setuserPassword] = useState("");
   const [openLoading, setOpenLoading] = useState(null);
+  const [superUser, setSuperUser] = useState("parent");
+  const navigate = useNavigate();
 
   const emptyFields = () => toast.error("All the fields are required");
-  const wronUser = () => toast.error("Wrong user email or password");
+  const wronUser = () => toast.error("An Error Occured");
+  const userAdde = () => toast.success("User Added Successfully");
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCloseLoging = () => {
     setOpenLoading(null);
@@ -38,14 +42,20 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email.trim().length === 0 || password.trim().length === 0) {
+    if (
+      userName.trim().length === 0 ||
+      userEmail.trim().length === 0 ||
+      userPassword.trim().length === 0
+    ) {
       emptyFields();
     } else {
       setOpenLoading(true);
       await axios
-        .post(`${process.env.REACT_APP_Server_Url}auth/login`, {
-          userEmail: email,
-          password: password,
+        .post(`${process.env.REACT_APP_Server_Url}auth/register`, {
+          userEmail: userEmail,
+          password: userPassword,
+          userName: userName,
+          userRights: superUser,
         })
         .then((logins) => {
           sessionStorage.setItem("user", JSON.stringify(logins.data));
@@ -53,6 +63,7 @@ export default function LoginForm() {
             type: actionType.SET_USER,
             user: logins.data,
           });
+          userAdde();
           setOpenLoading(null);
           navigate("/dashboard", { replace: true });
         })
@@ -67,17 +78,24 @@ export default function LoginForm() {
     <>
       <Stack spacing={3}>
         <TextField
+          name="userName"
+          label="User Name"
+          value={userName}
+          onChange={(e) => setuserName(e.target.value)}
+        />
+        <TextField
           name="email"
           label="Email address"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={userEmail}
+          onChange={(e) => setuserEmail(e.target.value)}
         />
 
         <TextField
           name="password"
           label="Password"
           type={showPassword ? "text" : "password"}
+          value={userPassword}
+          onChange={(e) => setuserPassword(e.target.value)}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -92,9 +110,6 @@ export default function LoginForm() {
               </InputAdornment>
             ),
           }}
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
         />
       </Stack>
 
@@ -102,20 +117,20 @@ export default function LoginForm() {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
+        flexDirection={"row-reverse"}
         sx={{ my: 2 }}
       >
-        {/* <Checkbox name="remember" label="Remember me" /> */}
-        <Link
-          variant="subtitle2"
-          underline="hover"
-          onClick={(e) => navigate("/register", { replace: true })}
-          sx={{ cursor: "pointer" }}
-        >
-          Create Account for parents?
-        </Link>
-        <Link variant="subtitle2" underline="hover" sx={{ cursor: "pointer" }}>
-          Forgot password?
-        </Link>
+        <Checkbox
+          name="remember"
+          label="Remember me"
+          value={superUser}
+          checked={superUser}
+          disabled
+          onChange={(e) => setSuperUser(!superUser)}
+        />
+        <Typography variant="subtitle2" underline="hover">
+          Parent/Guardian?
+        </Typography>
       </Stack>
 
       <LoadingButton
@@ -125,8 +140,9 @@ export default function LoginForm() {
         variant="contained"
         onClick={handleSubmit}
       >
-        Login
+        Register
       </LoadingButton>
+      {/* <ToastContainer /> */}
       <Logging
         open={Boolean(openLoading)}
         handleCloseMenu={handleCloseLoging}

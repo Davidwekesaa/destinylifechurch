@@ -142,9 +142,13 @@ export default function UserPage({ headtext }) {
     { id: "gender", label: "Gender", alignRight: false },
     { id: "parentGurdian", label: "Parent/Gurdian", alignRight: false },
     { id: "parentContact", label: "Parent Contacts", alignRight: false },
-    { id: "present", label: `Present on ${formatDate()}`, alignRight: false },
+    {
+      id: "present",
+      label: `Present on ${formatDate()}`,
+      alignRight: false,
+    },
     { id: "history", label: "History", alignRight: false },
-    user.userRights === 1
+    user?.userRights === 1
       ? { id: "action", label: "Action", alignRight: false }
       : "",
     // { id: '' },
@@ -338,13 +342,17 @@ export default function UserPage({ headtext }) {
             <AddIcon />
             Add New Child
           </Button>
-          <Button
-            onClick={() => document.getElementById("fileInput").click()}
-            className="fileInputTex"
-            disabled={isUploading}
-          >
-            {isUploading ? "Uploading..." : "Upload File"}
-          </Button>
+          {user?.userRights === 3 || user?.userRights === 0 ? (
+            ""
+          ) : (
+            <Button
+              onClick={() => document.getElementById("fileInput").click()}
+              className="fileInputTex"
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Upload File"}
+            </Button>
+          )}
         </Box>
         <AddNewPupil
           open={Boolean(openAddNewPupil)}
@@ -605,6 +613,9 @@ export default function UserPage({ headtext }) {
                                 <Checkbox
                                   sx={{ borderRadius: 10 }}
                                   checked={isPresent(row.attendance)}
+                                  disabled={
+                                    user?.userRights === 3 ? true : false
+                                  }
                                   onChange={(event) =>
                                     chooseFunction(
                                       event,
@@ -737,6 +748,9 @@ export default function UserPage({ headtext }) {
                                 <Checkbox
                                   sx={{ borderRadius: 10 }}
                                   checked={isPresent(row.attendance)}
+                                  disabled={
+                                    user?.userRights === 3 ? true : false
+                                  }
                                   onChange={(event) =>
                                     chooseFunction(
                                       event,
@@ -748,7 +762,7 @@ export default function UserPage({ headtext }) {
                                 />
                               </TableCell>
 
-                              <TableCell align="left">
+                              <TableCell align="right">
                                 <IconButton
                                   size="small"
                                   color="inherit"
