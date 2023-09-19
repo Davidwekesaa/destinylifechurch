@@ -63,6 +63,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UpdatePupil from "src/layouts/dashboard/header/UpdatePupil";
 import RegisterPage from "./RegisterPage";
+import TopBar from "./Topbar/TopBar";
+import TableChildren from "./Table/TableChildren";
+import AddAndSearch from "./Topbar/AddAndSearch";
 
 // ----------------------------------------------------------------------
 
@@ -217,14 +220,6 @@ export default function UserPage({ headtext }) {
     event.preventDefault();
     if (id?.trim().length === 0) {
     } else {
-      // await axios
-      //   .get(`${process.env.REACT_APP_Server_Url}children/${id}`)
-      //   .then((children) => {
-      //     setChild(children?.data);
-      //     console.log("update chld", children?.data.fatherName);
-      //     setOpenchildpopup(true);
-      //   })
-      //   .catch((error) => {});
       setChild(id);
       setOpenchildpopup(true);
     }
@@ -385,134 +380,24 @@ export default function UserPage({ headtext }) {
       </Helmet>
 
       <Container>
-        <Box
-          sx={{
-            px: 0,
-            py: 0,
-            marginTop: -10,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography
-            variant="h3"
-            sx={{ color: "#000099", cursor: "pointer" }}
-            display={isDesktop ? "none" : "inline-block"}
-            onClick={openNav}
-          >
-            <ViewHeadlineIcon />
-          </Typography>
-        </Box>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          flexWrap="wrap"
-          mb={0}
-        >
-          <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-            <Button>Active Register for {headtext}</Button>
-          </Typography>
-
-          {user.userRights === 1 ? (
-            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-              <Button
-                onClick={() => document.getElementById("fileInput").click()}
-                className="fileInputTex"
-                disabled={isUploading}
-                variant="warning"
-                sx={{ fontSize: "20px", background: "#000099", color: "white" }}
-              >
-                {isUploading ? "Uploading..." : "Upload File"}
-              </Button>
-            </Typography>
-          ) : (
-            ""
-          )}
-
-          {user.userRights === 1 ? (
-            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-              <ExportCSV
-                csvData={sanitiseUser(filteredUsers)}
-                fileName={`report for ${headtext}`}
-                group={headtext}
-              />
-            </Typography>
-          ) : (
-            ""
-          )}
-          {user.userRights === 1 ? (
-            <Typography variant="h3" gutterBottom sx={{ color: "#000099" }}>
-              <Button
-                variant="warning"
-                sx={{ fontSize: "20px", background: "#000099", color: "white" }}
-                onClick={handleOpenRegister}
-              >
-                Add User
-              </Button>
-            </Typography>
-          ) : (
-            ""
-          )}
-        </Stack>
-
-        <Stack
-          mb={0}
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ width: "40%", marginRight: 10 }}
-          >
-            {/* <UserListToolbar
-              filterName={filterName}
-              onFilterName={handleFilterByName}
-            /> */}
-
-            <TextField
-              name="search"
-              placeholder="Search by | child name | parents name | date of birth | gender | parents contacts |"
-              // label="User Name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ width: "100%" }}
-            />
-          </Typography>
-          <Stack direction="row" alignItems="center" mb={0}>
-            <Typography
-              variant="h5"
-              gutterBottom
-              pr={5}
-              sx={{ color: "#B6B6B4" }}
-            >
-              {`${getPresentToday(filteredUsers)}/${
-                filteredUsers?.length
-              } Present Today`}
-            </Typography>
-            <Typography
-              variant="h5"
-              gutterBottom
-              pr={5}
-              sx={{ color: "#B6B6B4" }}
-            >
-              {`${getPresentLastWeek(filteredUsers)}/${
-                filteredUsers?.length
-              } Present Last Week`}
-            </Typography>
-          </Stack>
-        </Stack>
+        <TopBar
+          headtext={headtext}
+          isUploading={isUploading}
+          search={search}
+          setSearch={setSearch}
+          filteredUsers={filteredUsers}
+          sanitiseUser={sanitiseUser}
+          handleOpenRegister={handleOpenRegister}
+          getPresentToday={getPresentToday}
+          getPresentLastWeek={getPresentLastWeek}
+        />
         <Divider sx={{ borderStyle: "solid" }} mb={5} fontSize={500} />
-        <Stack
+        {/* <Stack
+          display={"flex"}
           direction="row"
           alignItems="center"
           justifyContent="space-between"
+          flexWrap={"wrap"}
           mb={2}
           mt={3}
         >
@@ -524,7 +409,27 @@ export default function UserPage({ headtext }) {
           >
             <AddIcon /> Add New Child
           </Button>
-        </Stack>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ width: "60%", marginRight: 10 }}
+            className="top-search"
+          >
+            <TextField
+              name="search"
+              placeholder="Search by | child name | parents name | date of birth | gender | parents contacts |"
+              // label="User Name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{ width: "100%" }}
+            />
+          </Typography>
+        </Stack> */}
+        <AddAndSearch
+          handleOpenMenuAddNewPupil={handleOpenMenuAddNewPupil}
+          search={search}
+          setSearch={setSearch}
+        />
         <Card>
           <Scrollbar sx={{ height: heightRow }}>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -545,278 +450,46 @@ export default function UserPage({ headtext }) {
                           page * rowsPerPage,
                           page * rowsPerPage + rowsPerPage
                         )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              // hover
-                              key={row._id}
-                              tabIndex={-1}
-                              role="checkbox"
-                              // selected={selectedUser}
-                            >
-                              {/* <TableCell padding="checkbox">
-                                <Checkbox
-                                // checked={selectedUser}
-                                // onChange={(event) => handleClick(event, row.id)}
-                                />
-                              </TableCell> */}
-
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                padding="none"
-                              >
-                                <Stack
-                                  direction="row"
-                                  alignItems="center"
-                                  spacing={2}
-                                >
-                                  <Typography variant="subtitle2" noWrap>
-                                    {row.childName}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {" "}
-                                {row?.DOB ? calculateAge(row?.DOB) : null}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {returnFirstLetter(row.childGender)}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row?.fatherName && row?.parentName
-                                  ? ` ${row?.fatherName} / ${row?.parentName} `
-                                  : row?.fatherName && !row?.parentName
-                                  ? row?.fatherName
-                                  : row?.parentName}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row?.fatherContact && row?.parentContact
-                                  ? ` ${row?.fatherContact} / ${row?.parentContact} `
-                                  : row?.fatherContact && !row?.parentContact
-                                  ? row?.fatherContact
-                                  : row?.parentContact}
-                              </TableCell>
-
-                              <TableCell
-                                align="left"
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Checkbox
-                                  sx={{ borderRadius: 10 }}
-                                  checked={isPresent(row.attendance)}
-                                  disabled={
-                                    user?.userRights === 3 ? true : false
-                                  }
-                                  onChange={(event) =>
-                                    chooseFunction(
-                                      event,
-                                      row._id,
-                                      setchangedIsPresent,
-                                      isPresent(row.attendance)
-                                    )
-                                  }
-                                />
-                              </TableCell>
-
-                              <TableCell align="left">
-                                <IconButton
-                                  size="small"
-                                  color="inherit"
-                                  onClick={(event) =>
-                                    handleOpenMenuHistory(event, row._id)
-                                  }
-                                >
-                                  <HistoryToggleOffIcon
-                                    sx={{ fontSize: "30px" }}
-                                  />
-                                </IconButton>
-                              </TableCell>
-                              {user.userRights === 1 ? (
-                                <TableCell align="left">
-                                  <IconButton size="small" color="inherit">
-                                    <span
-                                      className={`dash-status edit`}
-                                      // onClick={(`${row.status}`)}
-                                      onClick={(e) =>
-                                        handleClickOpenEditPopUp(e, row._id)
-                                      }
-                                    >
-                                      Edit
-                                    </span>
-                                    {"   "}
-                                    <span
-                                      className={`dash-status declined`}
-                                      // onClick={(`${row.status}`)}
-                                      onClick={(e) =>
-                                        hundleRowDelete(
-                                          e,
-                                          row._id,
-                                          setchangedIsPresent,
-                                          deleteComplete
-                                        )
-                                      }
-                                    >
-                                      Delete
-                                    </span>
-                                  </IconButton>
-                                </TableCell>
-                              ) : (
-                                ""
-                              )}
-                            </TableRow>
-                          );
-                        })
+                        .map((row) => (
+                          <TableChildren
+                            row={row}
+                            calculateAge={calculateAge}
+                            returnFirstLetter={returnFirstLetter}
+                            isPresent={isPresent}
+                            chooseFunction={chooseFunction}
+                            setchangedIsPresent={setchangedIsPresent}
+                            handleOpenMenuHistory={handleOpenMenuHistory}
+                            handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                            hundleRowDelete={hundleRowDelete}
+                            deleteComplete={deleteComplete}
+                          />
+                        ))
                     : filteredUsers
                         ?.slice(
                           page * rowsPerPage,
                           page * rowsPerPage + rowsPerPage
                         )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              hover
-                              key={row._id}
-                              tabIndex={-1}
-                              role="checkbox"
-                              // selected={selectedUser}
-                            >
-                              {/* <TableCell padding="checkbox">
-                                <Checkbox
-                                // checked={selectedUser}
-                                // onChange={(event) => handleClick(event, row.id)}
-                                />
-                              </TableCell> */}
-
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                padding="none"
-                              >
-                                <Stack
-                                  direction="row"
-                                  alignItems="center"
-                                  spacing={2}
-                                >
-                                  <Typography variant="subtitle2" noWrap>
-                                    {row.childName}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {" "}
-                                {row?.DOB ? calculateAge(row?.DOB) : null}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {returnFirstLetter(row.childGender)}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row?.fatherName && row?.parentName
-                                  ? ` ${row?.fatherName} / ${row?.parentName} `
-                                  : row?.fatherName && !row?.parentName
-                                  ? row?.fatherName
-                                  : row?.parentName}
-                              </TableCell>
-
-                              <TableCell align="left">
-                                {row?.fatherContact && row?.parentContact
-                                  ? ` ${row?.fatherContact} / ${row?.parentContact} `
-                                  : row?.fatherContact && !row?.parentContact
-                                  ? row?.fatherContact
-                                  : row?.parentContact}
-                              </TableCell>
-
-                              <TableCell
-                                align="left"
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Checkbox
-                                  sx={{ borderRadius: 10 }}
-                                  checked={isPresent(row.attendance)}
-                                  disabled={
-                                    user?.userRights === 3 ? true : false
-                                  }
-                                  onChange={(event) =>
-                                    chooseFunction(
-                                      event,
-                                      row._id,
-                                      setchangedIsPresent,
-                                      isPresent(row.attendance)
-                                    )
-                                  }
-                                />
-                              </TableCell>
-
-                              <TableCell align="right">
-                                <IconButton
-                                  size="small"
-                                  color="inherit"
-                                  onClick={(event) =>
-                                    handleOpenMenuHistory(event, row._id)
-                                  }
-                                >
-                                  <HistoryToggleOffIcon
-                                    sx={{ fontSize: "30px" }}
-                                  />
-                                </IconButton>
-                              </TableCell>
-                              {user.userRights === 1 ? (
-                                <TableCell align="left">
-                                  <IconButton size="small" color="inherit">
-                                    <span
-                                      className={`dash-status edit`}
-                                      // onClick={(`${row.status}`)}
-                                      onClick={(e) =>
-                                        handleClickOpenEditPopUp(e, row._id)
-                                      }
-                                    >
-                                      Edit
-                                    </span>
-                                    {"   "}
-                                    <span
-                                      className={`dash-status declined`}
-                                      // onClick={(`${row.status}`)}
-                                      onClick={(e) =>
-                                        hundleRowDelete(
-                                          e,
-                                          row._id,
-                                          setchangedIsPresent,
-                                          deleteComplete
-                                        )
-                                      }
-                                    >
-                                      Delete
-                                    </span>
-                                  </IconButton>
-                                </TableCell>
-                              ) : (
-                                ""
-                              )}
-                            </TableRow>
-                          );
-                        })}
-                  {emptyRows > 0 && (
+                        .map((row) => (
+                          <TableChildren
+                            row={row}
+                            calculateAge={calculateAge}
+                            returnFirstLetter={returnFirstLetter}
+                            isPresent={isPresent}
+                            chooseFunction={chooseFunction}
+                            setchangedIsPresent={setchangedIsPresent}
+                            handleOpenMenuHistory={handleOpenMenuHistory}
+                            handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                            hundleRowDelete={hundleRowDelete}
+                            deleteComplete={deleteComplete}
+                          />
+                        ))}
+                  {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
                     </TableRow>
-                  )}
+                  )} */}
                 </TableBody>
-
+                {/* 
                 {isNotFound && (
                   <TableBody>
                     <TableRow>
@@ -840,7 +513,7 @@ export default function UserPage({ headtext }) {
                       </TableCell>
                     </TableRow>
                   </TableBody>
-                )}
+                )} */}
               </Table>
             </TableContainer>
           </Scrollbar>
