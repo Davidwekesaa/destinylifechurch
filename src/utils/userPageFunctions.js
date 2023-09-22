@@ -17,7 +17,7 @@ export function getPresentToday(filteredUsers) {
   var presentToday = 0;
   filteredUsers?.map((data) => {
     data?.attendance?.reduce((accumulator, currentObject) => {
-      if (currentObject.date === formatDate() && currentObject.present) {
+      if (currentObject?.date === formatDate() && currentObject?.present) {
         presentToday += 1;
       }
     }, null);
@@ -27,7 +27,7 @@ export function getPresentToday(filteredUsers) {
 }
 
 export function isMissing(attent) {
-  const isTodayPresent = attent.reduce((accumulator, currentObject) => {
+  const isTodayPresent = attent?.reduce((accumulator, currentObject) => {
     if (currentObject.date === formatDate() && !currentObject.present) {
       return true;
     }
@@ -38,7 +38,7 @@ export function isMissing(attent) {
 }
 
 export function isPresent(attent) {
-  const isTodayPresent = attent.reduce((accumulator, currentObject) => {
+  const isTodayPresent = attent?.reduce((accumulator, currentObject) => {
     if (currentObject.date === formatDate() && currentObject.present) {
       return true;
     }

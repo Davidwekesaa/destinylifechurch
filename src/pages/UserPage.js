@@ -71,38 +71,6 @@ import AddAndSearch from "./Topbar/AddAndSearch";
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(
-      array,
-      (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
-    );
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-
 export default function UserPage({ headtext }) {
   const [{ nav, user }, dispatch] = useStateValue();
   const [openHistory, setOpenHistory] = useState(null);
@@ -116,7 +84,6 @@ export default function UserPage({ headtext }) {
 
   const [orderBy, setOrderBy] = useState("name");
 
-  const [filterName, setFilterName] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [historyData, sethistoryData] = useState([]);
 
@@ -160,10 +127,11 @@ export default function UserPage({ headtext }) {
   useEffect(() => {
     //get all products
     const getAllChildren = async () => {
-      if (headtext.toLowerCase() !== "all") {
+      if (headtext?.toLowerCase() !== "all") {
         await axios
           .get(`${process.env.REACT_APP_Server_Url}children/`)
           .then((children) => {
+            console.log("data", children?.data);
             setFilteredUsers(
               children?.data?.filter((item) =>
                 item?.childCategory
@@ -177,6 +145,7 @@ export default function UserPage({ headtext }) {
         await axios
           .get(`${process.env.REACT_APP_Server_Url}children/`)
           .then((children) => {
+            console.log("data", children?.data);
             setFilteredUsers(children?.data);
           })
           .catch((error) => {});
@@ -188,22 +157,20 @@ export default function UserPage({ headtext }) {
   //serch
   useEffect(() => {
     setSearchUsers(
-      filteredUsers.filter(
+      filteredUsers?.filter(
         (child) =>
-          child?.childName?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.parentName?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.childGender?.toLowerCase().includes(search.toLowerCase()) ||
+          child?.childName?.toLowerCase().includes(search?.toLowerCase()) ||
+          child?.parentName?.toLowerCase().includes(search?.toLowerCase()) ||
+          child?.childGender?.toLowerCase().includes(search?.toLowerCase()) ||
           child?.DOB?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.childCategory?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.parentContact?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.fatherContact?.toLowerCase().includes(search.toLowerCase())
+          child?.childCategory?.toLowerCase().includes(search?.toLowerCase()) ||
+          child?.parentContact?.toLowerCase().includes(search?.toLowerCase()) ||
+          child?.fatherContact?.toLowerCase().includes(search?.toLowerCase())
       )
     );
   }, [search, changedIsPresent]);
   const handleOpenMenuHistory = async (event, id) => {
     event.preventDefault();
-    // setCheckHistory(id);
-
     if (id?.trim().length === 0) {
     } else {
       await axios
@@ -274,11 +241,6 @@ export default function UserPage({ headtext }) {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
   const openNav = () => {
     sessionStorage.setItem("nav", !nav);
     dispatch({
@@ -292,10 +254,9 @@ export default function UserPage({ headtext }) {
       ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers?.length)
       : 0;
 
-  const isNotFound = !filteredUsers?.length && !!filterName;
   const heightRow = 100 * rowsPerPage + 5;
 
-  if (filteredUsers.length === 0) {
+  if (filteredUsers?.length === 0) {
     return (
       <>
         <Box
@@ -392,39 +353,7 @@ export default function UserPage({ headtext }) {
           getPresentLastWeek={getPresentLastWeek}
         />
         <Divider sx={{ borderStyle: "solid" }} mb={5} fontSize={500} />
-        {/* <Stack
-          display={"flex"}
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          flexWrap={"wrap"}
-          mb={2}
-          mt={3}
-        >
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="ic_disabled" />}
-            sx={{ backgroundColor: "#000099" }}
-            onClick={handleOpenMenuAddNewPupil}
-          >
-            <AddIcon /> Add New Child
-          </Button>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ width: "60%", marginRight: 10 }}
-            className="top-search"
-          >
-            <TextField
-              name="search"
-              placeholder="Search by | child name | parents name | date of birth | gender | parents contacts |"
-              // label="User Name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ width: "100%" }}
-            />
-          </Typography>
-        </Stack> */}
+
         <AddAndSearch
           handleOpenMenuAddNewPupil={handleOpenMenuAddNewPupil}
           search={search}
@@ -444,13 +373,13 @@ export default function UserPage({ headtext }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {search.trim().length != 0 && searchUsers?.length != 0
+                  {search?.trim()?.length !== 0 && searchUsers?.length !== 0
                     ? searchUsers
-                        ?.slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((row) => (
+                        // ?.slice(
+                        //   page * rowsPerPage,
+                        //   page * rowsPerPage + rowsPerPage
+                        // )
+                        ?.map((row) => (
                           <TableChildren
                             row={row}
                             calculateAge={calculateAge}
@@ -465,11 +394,11 @@ export default function UserPage({ headtext }) {
                           />
                         ))
                     : filteredUsers
-                        ?.slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((row) => (
+                        // ?.slice(
+                        //   page * rowsPerPage,
+                        //   page * rowsPerPage + rowsPerPage
+                        // )
+                        ?.map((row) => (
                           <TableChildren
                             row={row}
                             calculateAge={calculateAge}
