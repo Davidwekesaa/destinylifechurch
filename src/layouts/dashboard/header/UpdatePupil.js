@@ -30,20 +30,12 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import dayjs from "dayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers";
-import {
-  formatPickedDate,
-  reverseformatDate,
-} from "../../../utils/userPageFunctions";
+import { CircularProgress } from "@mui/material";
 import Logging from "./Logging";
 
 // ----------------------------------------------------------------------
 
-function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
+function UpdatePupil({ open, handleCloseMenu, cganges, child, rdmm }) {
   const [fName, setFname] = useState("");
   const [fContact, setFContact] = useState("");
 
@@ -65,26 +57,24 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
   const su = () => toast.success("Record added successful");
 
   useEffect(() => {
-    const ftch = async () => {
+    const runn = async () => {
       await axios
-        .get(`${process.env.REACT_APP_Server_Url}children/${childData}`)
+        .get(`${process.env.REACT_APP_Server_Url}children/${child}`)
         .then((data) => {
-          setFname(data?.data?.fatherName);
-          setFContact(data?.data?.fatherContact);
-          setPname(data?.data?.parentName);
-          setpContact(data?.data?.parentContact);
-          setRelationShip(data?.data?.Relationship);
-          setCname(data?.data?.childName);
-          setcGender(data?.data?.childGender);
-          setAge(data?.data?.DOB);
+          console.log("child data", data?.data[0]?.childName);
+          setPname(data?.data[0].parentName);
+          setpContact(data?.data[0].parentContact);
+          setRelationShip(data?.data[0].Relationship);
+          setCname(data?.data[0].childName);
+          setcGender(data?.data[0].childGender);
+          setAge(data?.data[0].DOB);
+          setFname(data?.data[0].fatherName);
+          setFContact(data?.data[0].fatherContact);
         })
         .catch((error) => {});
     };
-
-    ftch();
-
-    // console.log("udate child", childData?.childCategory);
-  }, [childData]);
+    runn();
+  }, [rdmm]);
 
   const setEmptyFields = () => {
     setPname("");
@@ -97,22 +87,11 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
     setFContact("");
   };
 
-  const addNewPupill = async () => {
-    // if (
-    //   pName.trim().length === 0 ||
-    //   pContact.trim().length === 0 ||
-    //   relationShip.trim().length === 0 ||
-    //   cName.trim().length === 0 ||
-    //   cGender.trim().length === 0 ||
-    //   age?.length === 0 ||
-    //   fName.trim().length === 0 ||
-    //   fContact.trim().length === 0
-    // ) {
-    //   emptyFields();
-    // } else {
+  const addNewPupill = async (e) => {
+    e.preventDefault();
     setOpenLoading(true);
     await axios
-      .put(`${process.env.REACT_APP_Server_Url}children/child/${childData}`, {
+      .put(`${process.env.REACT_APP_Server_Url}children/child/${child}`, {
         parentName: pName,
         parentContact: pContact,
         fatherName: fName,
@@ -141,6 +120,67 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
   const handleCloseLoging = () => {
     setOpenLoading(null);
   };
+  // if (childData?.length === 0) {
+  //   return (
+  //     <>
+  //       <Popover
+  //         open={open}
+  //         anchorEl={open}
+  //         onClose={handleCloseMenu}
+  //         anchorOrigin={{ vertical: "center", horizontal: "center" }}
+  //         transformOrigin={{ vertical: "center", horizontal: "center" }}
+  //         PaperProps={{
+  //           sx: {
+  //             mt: 1.5,
+  //             ml: 0.75,
+  //             width: 570,
+  //           },
+  //         }}
+  //       >
+  //         <Box sx={{ display: "flex", alignItems: "center", py: 2, px: 2.5 }}>
+  //           <Box
+  //             sx={{
+  //               flexGrow: 1,
+  //               display: "flex",
+  //               alignItems: "center",
+  //               justifyContent: "space-between",
+  //               flexDirection: "row-reverse",
+  //             }}
+  //           >
+  //             <IconButton
+  //               size="large"
+  //               color="inherit"
+  //               onClick={(e) => handleCloseMenu(e)}
+  //               sx={{ color: "#B6B6B4" }}
+  //             >
+  //               X
+  //             </IconButton>
+
+  //             <Typography
+  //               variant="h3"
+  //               sx={{ marginBottom: 2, color: "#000099" }}
+  //             >
+  //               Update Child Record
+  //             </Typography>
+  //           </Box>
+  //         </Box>
+  //         <Box
+  //           sx={{
+  //             display: "flex",
+  //             alignItems: "center",
+  //             justifyContent: "space-between",
+  //             flexDirection: "row",
+  //             width: "100%",
+  //             marginRight: "50%",
+  //             marginLeft: "50%",
+  //           }}
+  //         >
+  //           <CircularProgress />
+  //         </Box>
+  //       </Popover>
+  //     </>
+  //   );
+  // }
   return (
     <>
       <Popover
@@ -170,7 +210,7 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
             <IconButton
               size="large"
               color="inherit"
-              onClick={handleCloseMenu}
+              onClick={(e) => handleCloseMenu(e)}
               sx={{ color: "#B6B6B4" }}
             >
               X
@@ -270,51 +310,14 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
               value={cName}
             />
 
-            {/* <FormControl
-              sx={{
-                width: "217px",
-                height: 50,
-                marginBottom: 2,
-              }}
-              size="small"
-            >
-              <InputLabel id="demo-select-small-label">Gender</InputLabel>
-              <Select
-                labelId="demo-select-small-label"
-                id="demo-select-small"
-                value={cGender}
-                label="Gender"
-                onChange={(e) => setcGender(e.target.value)}
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <MenuItem value="">
-                  <em></em>
-                </MenuItem>
-                <MenuItem value="Male">Male</MenuItem>
-                <MenuItem value="Female">Female</MenuItem>
-              </Select>
-            </FormControl> */}
             <TextField
-              name="DOB"
-              label="DOB"
+              name="Gender"
+              label="Gender"
               sx={{ marginBottom: 2 }}
               required
               onChange={(e) => setcGender(e.target.value)}
               value={cGender}
             />
-            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker", "DatePicker"]}>
-                <DatePicker
-                  label="Date of Birth"
-                  sx={{ marginBottom: 2, width: "217px" }}
-                  value={age}
-                  onChange={(newDate) => setAge(newDate)}
-                />
-              </DemoContainer>
-            </LocalizationProvider> */}
             <TextField
               name="DOB"
               label="DOB"
@@ -357,7 +360,7 @@ function UpdatePupil({ open, handleCloseMenu, childData, cganges }) {
         <Divider sx={{ borderStyle: "dashed" }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth disableRipple onClick={addNewPupill}>
+          <Button fullWidth disableRipple onClick={(e) => addNewPupill(e)}>
             Update
           </Button>
         </Box>

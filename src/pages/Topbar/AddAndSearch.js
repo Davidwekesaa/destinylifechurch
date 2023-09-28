@@ -1,30 +1,20 @@
-import React from "react";
-import {
-  Card,
-  Table,
-  Stack,
-  Paper,
-  Avatar,
-  Button,
-  Popover,
-  Checkbox,
-  TableRow,
-  MenuItem,
-  TableBody,
-  TableCell,
-  Container,
-  Typography,
-  IconButton,
-  TableContainer,
-  TablePagination,
-  Divider,
-  Box,
-  LinearProgress,
-  TextField,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Stack, Button, Typography, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Iconify from "../../components/iconify";
-function AddAndSearch({ handleOpenMenuAddNewPupil, search, setSearch }) {
+import axios from "axios";
+function AddAndSearch({ handleOpenMenuAddNewPupil, setSearchUsers }) {
+  const [search, setSearch] = useState("");
+
+  const toSearch = async (e) => {
+    e.preventDefault();
+    await axios
+      .get(`${process.env.REACT_APP_Server_Url}children/child/${search}`)
+      .then((children) => {
+        setSearchUsers(children?.data);
+      })
+      .catch((error) => {});
+  };
   return (
     <Stack
       display={"flex"}
@@ -46,17 +36,18 @@ function AddAndSearch({ handleOpenMenuAddNewPupil, search, setSearch }) {
       <Typography
         variant="h4"
         gutterBottom
-        sx={{ width: "60%", marginRight: 10 }}
+        sx={{ width: "60%", marginRight: 10, display: "flex" }}
         className="top-search"
       >
         <TextField
           name="search"
-          placeholder="Search by | child name | parents name | date of birth | gender | parents contacts |"
+          placeholder="Search by | child name "
           // label="User Name"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           sx={{ width: "100%" }}
         />
+        <button onClick={(e) => toSearch(e)}>search</button>
       </Typography>
     </Stack>
   );

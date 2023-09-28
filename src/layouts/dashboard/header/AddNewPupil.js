@@ -58,7 +58,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
   const [openLoading, setOpenLoading] = useState(null);
 
   const emptyFields = () => toast.error("All the fields are required");
-  const errorr = () => toast.error("There was error");
+  const errorr = () => toast.error("There was add new error");
   const su = () => toast.success("Record added successful");
 
   // useEffect(() => {
@@ -76,7 +76,8 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
     setFContact("");
   };
 
-  const addNewPupill = async () => {
+  const addNewPupill = async (e) => {
+    e.preventDefault();
     if (
       pName.trim().length === 0 ||
       pContact.trim().length === 0 ||
@@ -110,6 +111,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
           handleCloseMenu();
         })
         .catch((error) => {
+          console.log("add error", error);
           setOpenLoading(null);
           errorr();
         });
@@ -148,7 +150,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
             <IconButton
               size="large"
               color="inherit"
-              onClick={handleCloseMenu}
+              onClick={(e) => handleCloseMenu(e)}
               sx={{ color: "#B6B6B4" }}
             >
               X

@@ -77,7 +77,7 @@ export function returnFirstLetter(name) {
   return firstLetter;
 }
 
-export function getPresentLastWeek(filteredUsers) {
+export const getPresentLastWeek = (filteredUsers) => {
   var presentLastWeek = 0;
   filteredUsers?.map((data) => {
     if (
@@ -96,7 +96,7 @@ export function getPresentLastWeek(filteredUsers) {
   });
 
   return presentLastWeek;
-}
+};
 
 export const formatPickedDate = (date) => {
   const inputDate = new Date(date);

@@ -102,22 +102,36 @@ function TableChildren({
         </IconButton>
       </TableCell>
       {user.userRights === 1 ? (
-        <TableCell align="left">
-          <IconButton size="small" color="inherit">
+        <TableCell
+          align="left"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={(e) => handleClickOpenEditPopUp(e, row._id)}
+          >
             <span
               className={`dash-status edit`}
               // onClick={(`${row.status}`)}
-              onClick={(e) => handleClickOpenEditPopUp(e, row._id)}
             >
               Edit
             </span>
-            {"   "}
+          </IconButton>
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={(e) =>
+              hundleRowDelete(e, row._id, setchangedIsPresent, deleteComplete)
+            }
+          >
             <span
               className={`dash-status declined`}
               // onClick={(`${row.status}`)}
-              onClick={(e) =>
-                hundleRowDelete(e, row._id, setchangedIsPresent, deleteComplete)
-              }
             >
               Delete
             </span>

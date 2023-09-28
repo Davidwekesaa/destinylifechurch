@@ -11,8 +11,6 @@ import PresentOn from "./PresentOn";
 function TopBar({
   headtext,
   isUploading,
-  search,
-  setSearch,
   filteredUsers,
   sanitiseUser,
   handleOpenRegister,

@@ -54,6 +54,27 @@
   flex-direction: column-reverse;
   width: 30%;
 }
+.pge {
+  float: right;
+  padding-right: 10px;
+}
+.determine-page {
+  width: 300px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.determine-page-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.iconss {
+  margin-left: 10px;
+}
+.iconss:hover {
+  cursor: pointer;
+}
 @media screen and (max-width: 740px) {
   .top-bar {
     flex-direction: column;

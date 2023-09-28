@@ -62,7 +62,7 @@ export default function NotificationsPopover({
             <IconButton
               size="large"
               color="inherit"
-              onClick={handleCloseMenu}
+              onClick={(e) => handleCloseMenu(e)}
               sx={{ marginBottom: 2, color: "#B6B6B4" }}
             >
               X

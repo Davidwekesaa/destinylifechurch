@@ -66,6 +66,7 @@ import RegisterPage from "./RegisterPage";
 import TopBar from "./Topbar/TopBar";
 import TableChildren from "./Table/TableChildren";
 import AddAndSearch from "./Topbar/AddAndSearch";
+import Paging from "./Table/Paging";
 
 // ----------------------------------------------------------------------
 
@@ -76,7 +77,7 @@ export default function UserPage({ headtext }) {
   const [openHistory, setOpenHistory] = useState(null);
   const [openAddNewPupil, setOpenAddNewPupil] = useState(null);
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   const [order, setOrder] = useState("asc");
 
@@ -92,12 +93,13 @@ export default function UserPage({ headtext }) {
 
   const [changedIsPresent, setchangedIsPresent] = useState("");
 
-  const [search, setSearch] = useState("");
   const [searchUsers, setSearchUsers] = useState([]);
+  const [getStats, setGetStats] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const [child, setChild] = useState("");
   const [openchildpopup, setOpenchildpopup] = useState(null);
+  const [rdmm, setRdmm] = useState("");
 
   const [openRegister, setOpenRegister] = useState(false);
 
@@ -129,7 +131,11 @@ export default function UserPage({ headtext }) {
     const getAllChildren = async () => {
       if (headtext?.toLowerCase() !== "all") {
         await axios
-          .get(`${process.env.REACT_APP_Server_Url}children/`)
+          .get(
+            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+              page
+            )}&limit=${parseInt(rowsPerPage)}`
+          )
           .then((children) => {
             console.log("data", children?.data);
             setFilteredUsers(
@@ -143,7 +149,11 @@ export default function UserPage({ headtext }) {
           .catch((error) => {});
       } else {
         await axios
-          .get(`${process.env.REACT_APP_Server_Url}children/`)
+          .get(
+            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+              page
+            )}&limit=${parseInt(rowsPerPage)}`
+          )
           .then((children) => {
             console.log("data", children?.data);
             setFilteredUsers(children?.data);
@@ -151,24 +161,20 @@ export default function UserPage({ headtext }) {
           .catch((error) => {});
       }
     };
+    const getStats = async () => {
+      await axios
+        .get(`${process.env.REACT_APP_Server_Url}children/stats/child`)
+        .then((children) => {
+          setGetStats(children?.data);
+        })
+        .catch((error) => {});
+    };
+    getStats();
     getAllChildren();
-  }, [headtext, changedIsPresent]);
+  }, [headtext, changedIsPresent, page, rowsPerPage]);
 
   //serch
-  useEffect(() => {
-    setSearchUsers(
-      filteredUsers?.filter(
-        (child) =>
-          child?.childName?.toLowerCase().includes(search?.toLowerCase()) ||
-          child?.parentName?.toLowerCase().includes(search?.toLowerCase()) ||
-          child?.childGender?.toLowerCase().includes(search?.toLowerCase()) ||
-          child?.DOB?.toLowerCase().includes(search.toLowerCase()) ||
-          child?.childCategory?.toLowerCase().includes(search?.toLowerCase()) ||
-          child?.parentContact?.toLowerCase().includes(search?.toLowerCase()) ||
-          child?.fatherContact?.toLowerCase().includes(search?.toLowerCase())
-      )
-    );
-  }, [search, changedIsPresent]);
+
   const handleOpenMenuHistory = async (event, id) => {
     event.preventDefault();
     if (id?.trim().length === 0) {
@@ -185,25 +191,28 @@ export default function UserPage({ headtext }) {
 
   const handleClickOpenEditPopUp = async (event, id) => {
     event.preventDefault();
-    if (id?.trim().length === 0) {
-    } else {
-      setChild(id);
-      setOpenchildpopup(true);
-    }
+    const rdm = Math.floor(Math.random() * (1 - 1000)) + 1000;
+    setRdmm(rdm);
+    setChild(id);
+    setOpenchildpopup(true);
   };
-  const handleCloseMenuHistory = () => {
+  const handleCloseMenuHistory = (e) => {
+    e.preventDefault();
     setOpenHistory(null);
   };
   const handleCloseEditNewPupil = () => {
     setOpenchildpopup(null);
   };
   const handleOpenMenuAddNewPupil = (event) => {
+    event.preventDefault();
     setOpenAddNewPupil(event.currentTarget);
   };
-  const handleCloseRegister = () => {
+  const handleCloseRegister = (e) => {
+    e.preventDefault();
     setOpenRegister(null);
   };
-  const handleOpenRegister = () => {
+  const handleOpenRegister = (e) => {
+    e.preventDefault();
     setOpenRegister(true);
   };
 
@@ -237,7 +246,7 @@ export default function UserPage({ headtext }) {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setPage(0);
+    // setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
@@ -344,9 +353,7 @@ export default function UserPage({ headtext }) {
         <TopBar
           headtext={headtext}
           isUploading={isUploading}
-          search={search}
-          setSearch={setSearch}
-          filteredUsers={filteredUsers}
+          filteredUsers={getStats}
           sanitiseUser={sanitiseUser}
           handleOpenRegister={handleOpenRegister}
           getPresentToday={getPresentToday}
@@ -356,8 +363,8 @@ export default function UserPage({ headtext }) {
 
         <AddAndSearch
           handleOpenMenuAddNewPupil={handleOpenMenuAddNewPupil}
-          search={search}
-          setSearch={setSearch}
+          setSearchUsers={setSearchUsers}
+          filteredUsers={filteredUsers}
         />
         <Card>
           <Scrollbar sx={{ height: heightRow }}>
@@ -373,45 +380,37 @@ export default function UserPage({ headtext }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {search?.trim()?.length !== 0 && searchUsers?.length !== 0
-                    ? searchUsers
-                        // ?.slice(
-                        //   page * rowsPerPage,
-                        //   page * rowsPerPage + rowsPerPage
-                        // )
-                        ?.map((row) => (
-                          <TableChildren
-                            row={row}
-                            calculateAge={calculateAge}
-                            returnFirstLetter={returnFirstLetter}
-                            isPresent={isPresent}
-                            chooseFunction={chooseFunction}
-                            setchangedIsPresent={setchangedIsPresent}
-                            handleOpenMenuHistory={handleOpenMenuHistory}
-                            handleClickOpenEditPopUp={handleClickOpenEditPopUp}
-                            hundleRowDelete={hundleRowDelete}
-                            deleteComplete={deleteComplete}
-                          />
-                        ))
-                    : filteredUsers
-                        // ?.slice(
-                        //   page * rowsPerPage,
-                        //   page * rowsPerPage + rowsPerPage
-                        // )
-                        ?.map((row) => (
-                          <TableChildren
-                            row={row}
-                            calculateAge={calculateAge}
-                            returnFirstLetter={returnFirstLetter}
-                            isPresent={isPresent}
-                            chooseFunction={chooseFunction}
-                            setchangedIsPresent={setchangedIsPresent}
-                            handleOpenMenuHistory={handleOpenMenuHistory}
-                            handleClickOpenEditPopUp={handleClickOpenEditPopUp}
-                            hundleRowDelete={hundleRowDelete}
-                            deleteComplete={deleteComplete}
-                          />
-                        ))}
+                  {searchUsers?.length !== 0
+                    ? searchUsers?.map((row) => (
+                        <TableChildren
+                          key={row._id}
+                          row={row}
+                          calculateAge={calculateAge}
+                          returnFirstLetter={returnFirstLetter}
+                          isPresent={isPresent}
+                          chooseFunction={chooseFunction}
+                          setchangedIsPresent={setchangedIsPresent}
+                          handleOpenMenuHistory={handleOpenMenuHistory}
+                          handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                          hundleRowDelete={hundleRowDelete}
+                          deleteComplete={deleteComplete}
+                        />
+                      ))
+                    : filteredUsers?.map((row) => (
+                        <TableChildren
+                          key={row._id}
+                          row={row}
+                          calculateAge={calculateAge}
+                          returnFirstLetter={returnFirstLetter}
+                          isPresent={isPresent}
+                          chooseFunction={chooseFunction}
+                          setchangedIsPresent={setchangedIsPresent}
+                          handleOpenMenuHistory={handleOpenMenuHistory}
+                          handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                          hundleRowDelete={hundleRowDelete}
+                          deleteComplete={deleteComplete}
+                        />
+                      ))}
                   {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
@@ -447,7 +446,7 @@ export default function UserPage({ headtext }) {
             </TableContainer>
           </Scrollbar>
 
-          <TablePagination
+          {/* <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={filteredUsers?.length}
@@ -455,6 +454,14 @@ export default function UserPage({ headtext }) {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+          /> */}
+          <Paging
+            setRowsPerPage={setRowsPerPage}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            page={page}
           />
         </Card>
       </Container>
@@ -471,8 +478,9 @@ export default function UserPage({ headtext }) {
       <UpdatePupil
         open={Boolean(openchildpopup)}
         handleCloseMenu={handleCloseEditNewPupil}
-        childData={child}
         cganges={setchangedIsPresent}
+        child={child}
+        rdmm={rdmm}
       />
 
       <RegisterPage

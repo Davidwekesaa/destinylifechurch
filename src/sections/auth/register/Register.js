@@ -131,7 +131,7 @@ export default function Register({ handleCloseMenu }) {
         size="large"
         type="submit"
         variant="contained"
-        onClick={handleSubmit}
+        onClick={(e) => handleSubmit(e)}
       >
         Register
       </LoadingButton>
