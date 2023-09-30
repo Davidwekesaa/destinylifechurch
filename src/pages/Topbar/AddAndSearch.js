@@ -3,8 +3,13 @@ import { Stack, Button, Typography, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Iconify from "../../components/iconify";
 import axios from "axios";
-function AddAndSearch({ handleOpenMenuAddNewPupil, setSearchUsers }) {
-  const [search, setSearch] = useState("");
+function AddAndSearch({
+  handleOpenMenuAddNewPupil,
+  setSearchUsers,
+  search,
+  setSearch,
+}) {
+  // const [search, setSearch] = useState("");
 
   const toSearch = async (e) => {
     e.preventDefault();

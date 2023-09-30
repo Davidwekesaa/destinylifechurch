@@ -103,6 +103,8 @@ export default function UserPage({ headtext }) {
 
   const [openRegister, setOpenRegister] = useState(false);
 
+  const [search, setSearch] = useState("");
+
   const uploading = () =>
     toast.success("The file is being uploaded please wait...");
   const uploadComplete = () => toast.success("File  uploaded successfully");
@@ -128,49 +130,68 @@ export default function UserPage({ headtext }) {
 
   useEffect(() => {
     //get all products
-    const getAllChildren = async () => {
-      if (headtext?.toLowerCase() !== "all") {
+    if (searchUsers?.length !== 0 && search?.length !== 0) {
+      const toSearch = async (e) => {
+        e.preventDefault();
         await axios
           .get(
-            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
-              page
-            )}&limit=${parseInt(rowsPerPage)}`
+            `${
+              process.env.REACT_APP_Server_Url
+            }children/child/${search}/?p=${parseInt(page)}&limit=${parseInt(
+              rowsPerPage
+            )}`
           )
           .then((children) => {
-            console.log("data", children?.data);
-            setFilteredUsers(
-              children?.data?.filter((item) =>
-                item?.childCategory
-                  ?.toLowerCase()
-                  .includes(headtext?.toLowerCase())
-              )
-            );
+            setSearchUsers(children?.data);
           })
           .catch((error) => {});
-      } else {
+      };
+      toSearch();
+    } else {
+      const getAllChildren = async () => {
+        if (headtext?.toLowerCase() !== "all") {
+          await axios
+            .get(
+              `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+                page
+              )}&limit=${parseInt(rowsPerPage)}`
+            )
+            .then((children) => {
+              console.log("data", children?.data);
+              setFilteredUsers(
+                children?.data?.filter((item) =>
+                  item?.childCategory
+                    ?.toLowerCase()
+                    .includes(headtext?.toLowerCase())
+                )
+              );
+            })
+            .catch((error) => {});
+        } else {
+          await axios
+            .get(
+              `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+                page
+              )}&limit=${parseInt(rowsPerPage)}`
+            )
+            .then((children) => {
+              console.log("data", children?.data);
+              setFilteredUsers(children?.data);
+            })
+            .catch((error) => {});
+        }
+      };
+      const getStats = async () => {
         await axios
-          .get(
-            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
-              page
-            )}&limit=${parseInt(rowsPerPage)}`
-          )
+          .get(`${process.env.REACT_APP_Server_Url}children/stats/child`)
           .then((children) => {
-            console.log("data", children?.data);
-            setFilteredUsers(children?.data);
+            setGetStats(children?.data);
           })
           .catch((error) => {});
-      }
-    };
-    const getStats = async () => {
-      await axios
-        .get(`${process.env.REACT_APP_Server_Url}children/stats/child`)
-        .then((children) => {
-          setGetStats(children?.data);
-        })
-        .catch((error) => {});
-    };
-    getStats();
-    getAllChildren();
+      };
+      getStats();
+      getAllChildren();
+    }
   }, [headtext, changedIsPresent, page, rowsPerPage]);
 
   //serch
@@ -365,6 +386,8 @@ export default function UserPage({ headtext }) {
           handleOpenMenuAddNewPupil={handleOpenMenuAddNewPupil}
           setSearchUsers={setSearchUsers}
           filteredUsers={filteredUsers}
+          search={search}
+          setSearch={setSearch}
         />
         <Card>
           <Scrollbar sx={{ height: heightRow }}>
