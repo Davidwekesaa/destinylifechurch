@@ -149,37 +149,17 @@ export default function UserPage({ headtext }) {
       toSearch();
     } else {
       const getAllChildren = async () => {
-        if (headtext?.toLowerCase() !== "all") {
-          await axios
-            .get(
-              `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
-                page
-              )}&limit=${parseInt(rowsPerPage)}`
-            )
-            .then((children) => {
-              console.log("data", children?.data);
-              setFilteredUsers(
-                children?.data?.filter((item) =>
-                  item?.childCategory
-                    ?.toLowerCase()
-                    .includes(headtext?.toLowerCase())
-                )
-              );
-            })
-            .catch((error) => {});
-        } else {
-          await axios
-            .get(
-              `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
-                page
-              )}&limit=${parseInt(rowsPerPage)}`
-            )
-            .then((children) => {
-              console.log("data", children?.data);
-              setFilteredUsers(children?.data);
-            })
-            .catch((error) => {});
-        }
+        await axios
+          .get(
+            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+              page
+            )}&limit=${parseInt(rowsPerPage)}&group=${headtext}`
+          )
+          .then((children) => {
+            console.log("data", children?.data);
+            setFilteredUsers(children?.data);
+          })
+          .catch((error) => {});
       };
       const getStats = async () => {
         await axios
