@@ -183,7 +183,9 @@ export default function UserPage({ headtext }) {
       };
       const getStats = async () => {
         await axios
-          .get(`${process.env.REACT_APP_Server_Url}children/stats/child`)
+          .get(
+            `${process.env.REACT_APP_Server_Url}children/stats/child/?group=${headtext}`
+          )
           .then((children) => {
             setGetStats(children?.data);
           })
