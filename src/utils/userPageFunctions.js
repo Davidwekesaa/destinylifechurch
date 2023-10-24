@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as XLSX from "xlsx";
+import { v4 } from "uuid";
 
 export function formatDate() {
   const date = new Date(); // Replace this with your date object
@@ -55,7 +56,7 @@ export const updateAttendanceIsPresent = async (e, id, setchangedIsPresent) => {
       present: true,
     })
     .then((children) => {
-      setchangedIsPresent(`${id}/true`);
+      setchangedIsPresent(v4());
     })
     .catch((error) => {});
 };
@@ -67,7 +68,7 @@ export const updateAttendanceIsMissing = async (e, id, setchangedIsPresent) => {
       present: false,
     })
     .then((children) => {
-      setchangedIsPresent(`${id}/false`);
+      setchangedIsPresent(v4());
     })
     .catch((error) => {});
 };

@@ -129,52 +129,33 @@ export default function UserPage({ headtext }) {
   ];
 
   useEffect(() => {
-    //get all products
-    if (searchUsers?.length !== 0 && search?.length !== 0) {
-      const toSearch = async (e) => {
-        e.preventDefault();
-        await axios
-          .get(
-            `${
-              process.env.REACT_APP_Server_Url
-            }children/child/${search}/?p=${parseInt(page)}&limit=${parseInt(
-              rowsPerPage
-            )}`
-          )
-          .then((children) => {
-            setSearchUsers(children?.data);
-          })
-          .catch((error) => {});
-      };
-      toSearch();
-    } else {
-      const getAllChildren = async () => {
-        await axios
-          .get(
-            `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
-              page
-            )}&limit=${parseInt(rowsPerPage)}&group=${headtext}`
-          )
-          .then((children) => {
-            console.log("data", children?.data);
-            setFilteredUsers(children?.data);
-          })
-          .catch((error) => {});
-      };
-      const getStats = async () => {
-        await axios
-          .get(
-            `${process.env.REACT_APP_Server_Url}children/stats/child/?group=${headtext}`
-          )
-          .then((children) => {
-            setGetStats(children?.data);
-          })
-          .catch((error) => {});
-      };
-      getStats();
-      getAllChildren();
-    }
-  }, [headtext, changedIsPresent, page, rowsPerPage]);
+    const getAllChildren = async () => {
+      await axios
+        .get(
+          `${process.env.REACT_APP_Server_Url}children/?p=${parseInt(
+            page
+          )}&limit=${parseInt(rowsPerPage)}&group=${headtext}&n=${search}`
+        )
+        .then((children) => {
+          console.log("data", children?.data);
+          setFilteredUsers(children?.data);
+        })
+        .catch((error) => {});
+    };
+    const getStats = async () => {
+      await axios
+        .get(
+          `${process.env.REACT_APP_Server_Url}children/stats/child/?group=${headtext}`
+        )
+        .then((children) => {
+          setGetStats(children?.data);
+        })
+        .catch((error) => {});
+    };
+    getStats();
+    getAllChildren();
+    // };
+  }, [headtext, changedIsPresent, page, rowsPerPage, , search]);
 
   //serch
 
@@ -268,7 +249,7 @@ export default function UserPage({ headtext }) {
 
   const heightRow = 100 * rowsPerPage + 5;
 
-  if (filteredUsers?.length === 0) {
+  if (filteredUsers?.length === 0 && search.trim().length === 0) {
     return (
       <>
         <Box
@@ -385,37 +366,40 @@ export default function UserPage({ headtext }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {searchUsers?.length !== 0
-                    ? searchUsers?.map((row) => (
-                        <TableChildren
-                          key={row._id}
-                          row={row}
-                          calculateAge={calculateAge}
-                          returnFirstLetter={returnFirstLetter}
-                          isPresent={isPresent}
-                          chooseFunction={chooseFunction}
-                          setchangedIsPresent={setchangedIsPresent}
-                          handleOpenMenuHistory={handleOpenMenuHistory}
-                          handleClickOpenEditPopUp={handleClickOpenEditPopUp}
-                          hundleRowDelete={hundleRowDelete}
-                          deleteComplete={deleteComplete}
-                        />
-                      ))
-                    : filteredUsers?.map((row) => (
-                        <TableChildren
-                          key={row._id}
-                          row={row}
-                          calculateAge={calculateAge}
-                          returnFirstLetter={returnFirstLetter}
-                          isPresent={isPresent}
-                          chooseFunction={chooseFunction}
-                          setchangedIsPresent={setchangedIsPresent}
-                          handleOpenMenuHistory={handleOpenMenuHistory}
-                          handleClickOpenEditPopUp={handleClickOpenEditPopUp}
-                          hundleRowDelete={hundleRowDelete}
-                          deleteComplete={deleteComplete}
-                        />
-                      ))}
+                  {
+                    // searchUsers?.length !== 0
+                    //   ? searchUsers?.map((row) => (
+                    //       <TableChildren
+                    //         key={row._id}
+                    //         row={row}
+                    //         calculateAge={calculateAge}
+                    //         returnFirstLetter={returnFirstLetter}
+                    //         isPresent={isPresent}
+                    //         chooseFunction={chooseFunction}
+                    //         setchangedIsPresent={setchangedIsPresent}
+                    //         handleOpenMenuHistory={handleOpenMenuHistory}
+                    //         handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                    //         hundleRowDelete={hundleRowDelete}
+                    //         deleteComplete={deleteComplete}
+                    //       />
+                    //     ))
+                    //   :
+                    filteredUsers?.map((row) => (
+                      <TableChildren
+                        key={row._id}
+                        row={row}
+                        calculateAge={calculateAge}
+                        returnFirstLetter={returnFirstLetter}
+                        isPresent={isPresent}
+                        chooseFunction={chooseFunction}
+                        setchangedIsPresent={setchangedIsPresent}
+                        handleOpenMenuHistory={handleOpenMenuHistory}
+                        handleClickOpenEditPopUp={handleClickOpenEditPopUp}
+                        hundleRowDelete={hundleRowDelete}
+                        deleteComplete={deleteComplete}
+                      />
+                    ))
+                  }
                   {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
