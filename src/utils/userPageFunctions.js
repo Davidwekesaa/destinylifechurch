@@ -99,18 +99,34 @@ export const getPresentLastWeek = (filteredUsers) => {
   return presentLastWeek;
 };
 
+// export const formatPickedDate = (date) => {
+//   const inputDate = new Date(date);
+
+//   const day = inputDate.getUTCDate();
+//   const month = inputDate.getUTCMonth() + 1; // Adding 1 since months are 0-based
+//   const year = inputDate.getUTCFullYear();
+
+//   const formattedDate = `${day.toString().padStart(2, "0")}/${month
+//     .toString()
+//     .padStart(2, "0")}/${year}`;
+
+//   return formattedDate;
+// };
+
 export const formatPickedDate = (date) => {
   const inputDate = new Date(date);
 
-  const day = inputDate.getUTCDate();
-  const month = inputDate.getUTCMonth() + 1; // Adding 1 since months are 0-based
-  const year = inputDate.getUTCFullYear();
+  if (!isNaN(inputDate)) {
+    const day = inputDate.getUTCDate() + 1;
+    const month = inputDate.getUTCMonth() + 1; // Adding 1 since months are 0-based
+    const year = inputDate.getUTCFullYear();
 
-  const formattedDate = `${day.toString().padStart(2, "0")}/${month
-    .toString()
-    .padStart(2, "0")}/${year}`;
-
-  return formattedDate;
+    return `${day.toString().padStart(2, "0")}/${month
+      .toString()
+      .padStart(2, "0")}/${year}`;
+  } else {
+    return date;
+  }
 };
 
 export const calculateAge = (birthdateStr) => {

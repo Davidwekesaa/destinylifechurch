@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
 import { useStateValue } from "../../store/StateProvider";
+import { formatPickedDate } from "src/utils/userPageFunctions";
 
 function TableChildren({
   row,
@@ -48,7 +49,7 @@ function TableChildren({
 
       <TableCell align="left">
         {" "}
-        {row?.DOB ? calculateAge(row?.DOB) : null}
+        {row?.DOB ? calculateAge(formatPickedDate(row?.DOB)) : null}
       </TableCell>
 
       <TableCell align="left">{returnFirstLetter(row.childGender)}</TableCell>

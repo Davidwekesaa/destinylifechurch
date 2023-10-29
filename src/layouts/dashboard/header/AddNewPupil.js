@@ -277,6 +277,16 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                 <MenuItem value="Female">Female</MenuItem>
               </Select>
             </FormControl>
+            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoContainer components={["DatePicker", "DatePicker"]}>
+                <DatePicker
+                  label="Date of Birth"
+                  sx={{ marginBottom: 2, width: "217px" }}
+                  value={age}
+                  onChange={(newDate) => setAge(newDate)}
+                />
+              </DemoContainer>
+            </LocalizationProvider> */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker", "DatePicker"]}>
                 <DatePicker
@@ -284,6 +294,7 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
                   sx={{ marginBottom: 2, width: "217px" }}
                   value={age}
                   onChange={(newDate) => setAge(newDate)}
+                  format="DD/MM/YYYY" // Set the desired format
                 />
               </DemoContainer>
             </LocalizationProvider>
