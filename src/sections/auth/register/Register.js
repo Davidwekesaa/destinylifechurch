@@ -60,9 +60,10 @@ export default function Register({ handleCloseMenu }) {
         .then((logins) => {
           userAdde();
           setOpenLoading(null);
-          handleCloseMenu();
+          handleCloseMenu(e);
         })
         .catch((error) => {
+          console.log("register error", error);
           setOpenLoading(null);
           wronUser();
         });
