@@ -333,3 +333,22 @@ export function reverseformatDate(inputDate) {
   // Return the formatted date as a string
   return formattedDate.toISOString();
 }
+
+export function capitalizeAllNames(fullName) {
+  // Trim leading and trailing spaces, and split the full name into an array of words
+  if (fullName?.trim().length !== 0) {
+    let words = fullName?.trim().split(/\s+/);
+
+    // Capitalize each word in the array
+    for (let i = 0; i < words?.length; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    // Join the words back into a string
+    let capitalizedFullName = words.join(" ");
+
+    return capitalizedFullName;
+  } else {
+    return null;
+  }
+}

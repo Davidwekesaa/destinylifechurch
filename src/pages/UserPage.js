@@ -463,6 +463,7 @@ export default function UserPage({ headtext }) {
         open={Boolean(openAddNewPupil)}
         handleCloseMenu={handleCloseMenuAddNewPupil}
         headTextdata={headtext}
+        setchangedIsPresent={setchangedIsPresent}
       />
       <UpdatePupil
         open={Boolean(openchildpopup)}

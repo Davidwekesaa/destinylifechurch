@@ -35,12 +35,21 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-import { formatPickedDate } from "../../../utils/userPageFunctions";
+import {
+  capitalizeAllNames,
+  formatPickedDate,
+  updateAttendanceIsPresent,
+} from "../../../utils/userPageFunctions";
 import Logging from "./Logging";
 
 // ----------------------------------------------------------------------
 
-function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
+function AddNewPupil({
+  open,
+  handleCloseMenu,
+  headTextdata,
+  setchangedIsPresent,
+}) {
   const [fName, setFname] = useState("");
   const [fContact, setFContact] = useState("");
 
@@ -94,20 +103,22 @@ function AddNewPupil({ open, handleCloseMenu, headTextdata }) {
       console.log("age", age);
       await axios
         .post(`${process.env.REACT_APP_Server_Url}children/`, {
-          parentName: pName,
+          parentName: capitalizeAllNames(pName),
           parentContact: pContact,
-          fatherName: fName,
+          fatherName: capitalizeAllNames(fName),
           fatherContact: fContact,
-          Relationship: relationShip,
-          childName: cName,
+          Relationship: capitalizeAllNames(relationShip),
+          childName: capitalizeAllNames(cName),
           childGender: cGender,
           DOB: formatPickedDate(age),
           visitor: visitor,
         })
         .then((logins) => {
+          // console.log("loinssss", logins?.data?._id);
           su();
           setEmptyFields();
           setOpenLoading(null);
+          updateAttendanceIsPresent(e, logins?.data?._id, setchangedIsPresent);
           handleCloseMenu();
         })
         .catch((error) => {
