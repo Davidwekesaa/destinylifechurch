@@ -11,7 +11,10 @@ import {
 } from "@mui/material";
 import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
 import { useStateValue } from "../../store/StateProvider";
-import { formatPickedDate } from "src/utils/userPageFunctions";
+import {
+  capitalizeAllNames,
+  formatPickedDate,
+} from "src/utils/userPageFunctions";
 
 function TableChildren({
   row,
@@ -42,7 +45,7 @@ function TableChildren({
       >
         <Stack direction="row" alignItems="center" spacing={2}>
           <Typography variant="subtitle2" noWrap>
-            {row?.childName}
+            {capitalizeAllNames(row?.childName)}
           </Typography>
         </Stack>
       </TableCell>
